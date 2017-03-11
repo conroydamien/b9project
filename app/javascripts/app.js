@@ -7,12 +7,13 @@ import { default as contract } from 'truffle-contract'
 
 // Import our contract artifacts and turn them into usable abstractions.
 import fundinghub_artifacts from '../../build/contracts/FundingHub.json'
+import project_artifacts from '../../build/contracts/Project.json'
 
 var app = angular.module('myApp', []);
 app.controller('myCtrl', function($scope) {
 
-// MetaCoin is our usable abstraction, which we'll use through the code below.
 var FundingHub = contract(fundinghub_artifacts);
+var Project = contract(project_artifacts);
 
 // The following code is simple to show off interacting with your contracts.
 // As your needs grow you will likely need to change its form and structure.
@@ -26,8 +27,8 @@ window.App = {
   start: function() {
     var self = this;
 
-    // Bootstrap the MetaCoin abstraction for Use.
     FundingHub.setProvider(web3.currentProvider);
+    Project.setProvider(web3.currentProvider);
     _gasPrice = web3.toWei(5, "Shannon");
 
     // Get the initial account balance so it can be displayed.
@@ -61,8 +62,11 @@ window.App = {
 function updateProjList() {
 
   var instance;
-  var projects ;
+  var projects;
+  var liveProjs;
   var numProjs;
+  var balances = [];
+  var targets;
 
   return FundingHub.deployed().then(function(_instance) {
     instance = _instance;
@@ -76,19 +80,60 @@ function updateProjList() {
       Array(numProjs.toNumber()).fill().map(instance.getProjectListElement.call)
     );
   })
-  .then(function(_projects){
+  .then(function(_projects) {
     projects = _projects;
-    console.log(projects);
-
     return Promise.all(
       projects.map(instance.isActive.call)
     );
   })
-  .then(function(r) {
-    function filterFunc (index) {
-      return r[projects.indexOf(index)];
+  .then(function(active) {
+    console.log("about to filter");
+
+    function filterFunc (address) {
+      return active[projects.indexOf(address)];
     }
-    $scope.projs = projects.filter(filterFunc);
+
+    return projects.filter(filterFunc);
+  })
+  .then(function(projects) {
+    console.log("filtered");
+    liveProjs = projects;
+    return Promise.all(
+      projects.map(Project.at)
+    )
+  })
+   .then(function(projectList) {
+    console.log(projectList);
+
+    function append(prj) {
+      return prj.projectData.call()
+      .then(function (data) {
+        data.push(prj.address);
+        return data;
+      })
+    }
+
+    return Promise.all(
+      projectList.map(append)
+    )
+  })
+  .then(function(projData) {
+
+    function addBalance(projData) {
+       projData.push(web3.eth.getBalance(projData[3]));
+       return projData;
+    }
+
+    return Promise.all(
+      projData.map(addBalance)
+    )
+  })
+  .then(function(projData) {
+    console.log(projData);
+    return $scope.projs = projData;//projData.map(pd => liveProjs.push(pd));
+  })
+  .then(function(r) {
+    $scope.accounts = accounts;
     return $scope.$apply();
   });
 };
@@ -100,7 +145,7 @@ $scope.createProject = function() {
                        // contributions otherwise it will pay out
     var deadline = 1513115725; // later in 2017
 
-    return instance.createProject(account,target,deadline, {from:account, gas:1000000});
+    return instance.createProject($scope.account,target,deadline, {from:$scope.account, gas:1000000});
   })
   .then(function(r) {
     updateProjList();
@@ -108,13 +153,15 @@ $scope.createProject = function() {
   });
 };
 
-$scope.fundProject = function() {
+$scope.fundProject = function(proj) {
+  $scope.projs
+  console.log("proj to fund: " + proj);
   var instance;
   console.log($scope.projectToFund);
   FundingHub.deployed()
   .then(function(_instance) {
     instance = _instance;
-    return instance.contribute($scope.projectToFund, {from:account, value:$scope.amount, gas:1000000});
+    return instance.contribute(proj, {from:$scope.account, value:$scope.amount, gas:1000000});
   })
   .then(function(r) {
     updateProjList();

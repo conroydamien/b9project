@@ -48,7 +48,7 @@ contract Project is IProject {
     _;
 	}
 
-  ProjectData projectData; // projectOwner, targetAmount and deadline
+  ProjectData public projectData; // projectOwner, targetAmount and deadline
 
 	mapping(address => uint) public contributorBalance; // balances are tracked, rather than contributions
 	address[] contributors; // keep a list of contributors as the keys of the hash cannot be listed
