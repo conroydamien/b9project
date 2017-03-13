@@ -18,10 +18,40 @@ var Project = contract(project_artifacts);
 // The following code is simple to show off interacting with your contracts.
 // As your needs grow you will likely need to change its form and structure.
 // For application bootstrapping, check out window.addEventListener below.
-var accounts;
+var accounts = [];
 var account;
 var _gasPrice;
-$scope.projs = [];
+$scope.projHash = {};
+
+
+function updateAfterContribEvent(e,r) {
+  console.log("r: " + r.address);
+  var address = r.address;
+  var balance;
+
+  updateAccounts();
+
+  return web3.eth.getBalance(r.address, function(e,r){
+    balance = r.toString();
+    try {
+      $scope.projHash[address].balance = balance;
+    }
+    catch (e) {
+      console.log(e);
+    }
+    $scope.$apply();
+    console.log("balance: " + balance);
+  });
+};
+
+function updateAfterFundedEvent(e,r) {
+  var address = r.address;
+  console.log("funded");
+  delete $scope.projHash[address];
+  $scope.$apply();
+};
+
+
 
 window.App = {
   start: function() {
@@ -30,6 +60,47 @@ window.App = {
     FundingHub.setProvider(web3.currentProvider);
     Project.setProvider(web3.currentProvider);
     _gasPrice = web3.toWei(5, "Shannon");
+    $scope.deadline = 1513115725;
+
+    FundingHub.deployed().then(function(_instance) {
+
+    updateProjList();
+
+      var prj;
+      var data;
+
+      _instance.NewProjectEvent().watch(function(e,r) {
+
+          updateAccounts();
+
+          Project.at(r.args.newProject)
+          .then(function(r){
+            prj = r;
+            return r.projectData.call()
+          })
+          .then(function (_data) {
+            data = _data;
+            console.log("created " + prj.address);
+            return data.push(prj.address);
+          })
+          .then(function(r){
+            return prj.ContribEvent().watch(updateAfterContribEvent);
+          })
+          .then(function(r){
+            return prj.FundedEvent().watch(updateAfterFundedEvent);
+          })
+          .then(function (r) {
+            return web3.eth.getBalance(prj.address).toString(10);
+          })
+          .then(function (balance) {
+            data.push(balance);
+            $scope.projHash[prj.address] = {address: prj.address, owner: data[0], deadline: data[2], target: data[1], balance: balance};
+            console.log($scope.projHash);
+            $scope.$apply();
+            return;
+          })
+      });
+    });
 
     // Get the initial account balance so it can be displayed.
     web3.eth.getAccounts(function(err, accs) {
@@ -43,21 +114,28 @@ window.App = {
         return;
       }
 
-      accounts = accs;
+      accs.map(x => accounts.push({number:x}));
       account = accounts[0];
 
-      updateProjList();
+      updateAccounts();
     });
-  },
-
-  setStatus: function(message) {
-    var status = document.getElementById("status");
-    status.innerHTML = message;
-  },
-
-  refreshBalance: function() {
-  },
+  }
 };
+
+function updateAccounts() {
+
+  function addBalance(account) {
+    account.balance = web3.eth.getBalance(account.number).toString(10);
+    return account;
+  }
+
+  Promise.all(
+    accounts.map(addBalance)
+  )
+
+  $scope.accounts=accounts;
+  $scope.$apply();
+}
 
 function updateProjList() {
 
@@ -65,8 +143,7 @@ function updateProjList() {
   var projects;
   var liveProjs;
   var numProjs;
-  var balances = [];
-  var targets;
+  var projHash = {};
 
   return FundingHub.deployed().then(function(_instance) {
     instance = _instance;
@@ -98,6 +175,7 @@ function updateProjList() {
   .then(function(projects) {
     console.log("filtered");
     liveProjs = projects;
+
     return Promise.all(
       projects.map(Project.at)
     )
@@ -105,9 +183,23 @@ function updateProjList() {
    .then(function(projectList) {
     console.log(projectList);
 
-    function append(prj) {
+    function append(_prj) {
+      var prj = _prj;
+      var data;
+
       return prj.projectData.call()
-      .then(function (data) {
+      .then(function(_data){
+        data = _data
+        return prj.FundedEvent().watch(updateAfterFundedEvent);
+      })
+      .then(function(r){
+        return prj.ContribEvent().watch(updateAfterContribEvent);
+      })
+      .then(function (r) {
+        projHash[prj.address] = {address: prj.address,
+        owner: data[0],
+        target: data[1],
+        deadline: data[2]}
         data.push(prj.address);
         return data;
       })
@@ -120,7 +212,8 @@ function updateProjList() {
   .then(function(projData) {
 
     function addBalance(projData) {
-       projData.push(web3.eth.getBalance(projData[3]));
+       projData.push(web3.eth.getBalance(projData[3]).toString(10));
+       projHash[projData[3]].balance = projData[4];
        return projData;
     }
 
@@ -130,25 +223,21 @@ function updateProjList() {
   })
   .then(function(projData) {
     console.log(projData);
-    return $scope.projs = projData;//projData.map(pd => liveProjs.push(pd));
-  })
-  .then(function(r) {
-    $scope.accounts = accounts;
+    $scope.projHash = projHash;
     return $scope.$apply();
   });
 };
 
+////////////////////////////////////////////////
+// controller functions
+
 $scope.createProject = function() {
   FundingHub.deployed().then(function(instance) {
     console.log("account: " + account);
-    var target = 3001; // this must be greater than the sum of the
-                       // contributions otherwise it will pay out
-    var deadline = 1513115725; // later in 2017
-
-    return instance.createProject($scope.account,target,deadline, {from:$scope.account, gas:1000000});
+    return instance.createProject($scope.newProjectOwner.number,$scope.target,$scope.deadline, {from:$scope.newProjectOwner.number, gas:1000000});
   })
   .then(function(r) {
-    updateProjList();
+    updateAccounts();
     $scope.$apply();
   });
 };
@@ -157,17 +246,19 @@ $scope.fundProject = function(proj) {
   $scope.projs
   console.log("proj to fund: " + proj);
   var instance;
-  console.log($scope.projectToFund);
   FundingHub.deployed()
   .then(function(_instance) {
     instance = _instance;
-    return instance.contribute(proj, {from:$scope.account, value:$scope.amount, gas:1000000});
+    return instance.contribute(proj, {from:$scope.account.number, value:$scope.amount, gas:1000000});
   })
   .then(function(r) {
-    updateProjList();
+    updateAccounts();
     $scope.$apply();
   })
 }
+
+// end of controller functions
+//////////////////////////////////////////////////////////
 
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)

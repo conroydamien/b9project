@@ -25,6 +25,10 @@ contract FundingHub is Mortal {
       uint value
   );
 
+  event NewProjectEvent(
+      address newProject
+  );
+
   /**
    * @return the number of projects attached to this hub
    */
@@ -56,6 +60,7 @@ contract FundingHub is Mortal {
 	function createProject(address _owner, uint _target, uint _deadline) public returns (IProject){
     IProject project = new Project(_owner, _target, _deadline);
     ProjectSetManager.add(projSet, project);
+    NewProjectEvent(project);
 		return project; // not visible from Truffle as tx_id is returned
 	}
 

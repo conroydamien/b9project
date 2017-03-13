@@ -10,45 +10,90 @@
   <link rel="stylesheet" href="./bootstrap.css">
 </head>
 <body>
-  <div style='display:table; max-height:330px; overflow:scroll;'>
-  <table style="width: auto;" class="table  table-striped  table-condensed" border=1>
-    <tr>
-      <th>Account</th>
-    </tr>
-    <tr ng-repeat="account in accounts">
-      <td>{{account}}</td>
-    </tr>
-  </table>
-</div>
 
-  Account to fund from:
-  <select ng-options="account for account in accounts" ng-model="account"></select>
-  <label for="amount">Amount to fund:</label><input type="text" id="amount" ng-model="amount" placeholder="e.g., 95"></input>
+<table border = 0>
+  <tr>
+    <td>
 
-  <div style='display:table; max-height:330px; overflow:scroll;'>
-  <table style="width: auto;" class="table  table-striped  table-condensed" border=1>
-    <tr>
-      <th>Owner</th>
-      <th>Target</th>
-      <th>Deadline</th>
-      <th>Project</th>
-      <th>Balance</th>
-      <th></th>
-    </tr>
-    <tr ng-repeat="project in projs">
-      <td>{{project[0]}}</td>
-      <td>{{project[1]}}</td>
-      <td>{{project[2]}}</td>
-      <td>{{project[3]}}</td>
-      <td>{{project[4]}}</td>
-      <td><button id="fundProj" ng-click="fundProject(project[3])">Fund Project</button></td>
-    </tr>
-  </table>
-</div>
+    <div style='display:table; max-height:330px; overflow:scroll;'>
+      <h2>Available Funding Accounts</h2>
+      <table style="width: auto;" class="table  table-striped  table-condensed" border=1>
+        <tr>
+          <th>Account</th><th>Balance</th>
+        </tr>
+        <tr ng-repeat="account in accounts">
+          <td>{{account.number}}</td><td>{{account.balance}}</td>
+        </tr>
+      </table>
+      </div>
 
-<div>
- <button type="button" class="btn btn-default" ng-click="createProject()">Create a project</button>
-</div>
+    </td>
+    <td valign=top>
+      <div>
+        <h2>Create a new project</h2>
+        <table border = 1>
+          <tr>
+            <td>Deadline:</td>
+            <td><input type="text" ng-model="deadline" placeholder="e.g., 95"></input></td>
+          <tr>
+            <td>Target:</td>
+            <td><input type="text" ng-model="target" placeholder="e.g., 95"></input></td>
+          <tr>
+            <td>Owner:</td>
+            <td><select ng-options="newProjectOwner.number for newProjectOwner in accounts" ng-model="newProjectOwner"></select></td>
+          </tr>
+          <tr>
+            <td colspan = 2 align ="center">
+              <button type="button" class="btn btn-default" ng-click="createProject()">Create a project</button>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </td>
+  </tr>
+
+
+  <tr>
+    <td colspan = 2>
+      <div style='display:table; max-height:330px; overflow:scroll;'>
+        <h2>Projects to fund</h2>
+        <table style="width: auto;" class="table  table-striped  table-condensed" border=1>
+          <tr>
+            <th>Project</th>
+            <th></th>
+            <th>Owner</th>
+            <th>Target</th>
+            <th>Deadline</th>
+            <th>Balance</th>
+          </tr>
+          <tr ng-repeat="project in projHash">
+            <td>{{project.address}}</td>
+            <td><button id="fundProj" ng-click="fundProject(project.address)">Fund</button></td>
+            <td>{{project.owner}}</td>
+            <td>{{project.target}}</td>
+            <td>{{project.deadline}}</td>
+            <td>{{project.balance}}</td>
+          </tr>
+        </table>
+    </div>
+    </td>
+  </tr>
+<tr>
+  <td colspan= 2>
+    <div>
+      <h2>Choose amount and account to fund from</h2>
+      <table border = 1>
+        <tr>
+          <td>Account to fund from:</td>
+          <td><select ng-options="account.number for account in accounts" ng-model="account"></select></td>
+          <td>Amount to fund:</td>
+          <td><input type="text" id="amount" ng-model="amount" placeholder="e.g., 95"></input></td>
+        </tr>
+      </table>
+    </div>
+   </td>
+</tr>
+</table>
 
 </body>
 </html>

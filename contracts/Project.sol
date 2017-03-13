@@ -6,6 +6,9 @@ import "./IProject.sol";
 
 contract Project is IProject {
 
+  event ContribEvent(
+  );
+
   /**
    * may be useful during debugging
    */
@@ -17,14 +20,12 @@ contract Project is IProject {
    * Notify any listeners that this project has been funded
    */
   event FundedEvent(
-    bool funded
   );
 
   /**
    * Notify any listeners that this project has been refunded
    */
   event RefundedEvent(
-    bool funded
   );
 
   /**
@@ -41,7 +42,7 @@ contract Project is IProject {
 	/**
    * don't accept funds past the deadline
 	 */
-	modifier notPastDeadline() {
+	modifier refundIfPastDeadline() {
     if (now > projectData.deadline) {
       refund();
     }
@@ -83,8 +84,10 @@ contract Project is IProject {
 	 *
 	 *  @param _sender the address of the sender that called the funding hub
 	 */
-	function fund(address _sender) payable nonZeroModifier notPastDeadline {
+	function fund(address _sender) payable nonZeroModifier refundIfPastDeadline {
     // for new contributors
+    ContribEvent();
+
 		if(contributorBalance[_sender] == 0){ // no existing balance for this contributor
 			contributors.push(_sender); // add to the array of contributors
 			contributorBalance[_sender] = 0; // initialise balance to zero
@@ -110,7 +113,7 @@ contract Project is IProject {
 	 * Payout the funds to the owner and kill this project.
 	 */
 	function payout() internal {
-    FundedEvent(true);
+    FundedEvent();
 		selfdestruct(projectData.projectOwner); // There are other options - this seems like the cleanest
 	}
 
@@ -119,7 +122,7 @@ contract Project is IProject {
 	 * and kill this project.
 	 */
 	function refund() public {
-    RefundedEvent(true);
+    RefundedEvent();
     if(this.balance > 0) {
       address contributor;
       bool retVal;
