@@ -15,36 +15,9 @@ app.controller('myCtrl', function($scope) {
 var FundingHub = contract(fundinghub_artifacts);
 var IProject = contract(iproject_artifacts);
 
-var accounts = [];
-var account;
-var _gasPrice;
-$scope.projHash = {};
-
-
-function updateAfterContribEvent(e,r) {
-  console.log("r: " + r.address);
-  var address = r.address;
-  var balance;
-
-  updateAccounts();
-
-  return web3.eth.getBalance(r.address, function(e,r){
-    balance = r.toString();
-    try {
-      $scope.projHash[address].balance = balance;
-    }
-    catch (e) {
-      console.log(e);
-    }
-    $scope.$apply();
-    console.log("balance: " + balance);
-  });
-};
-
-function deleteProjectFromList(e,r) {
-  delete $scope.projHash[r.address];
-  $scope.$apply();
-};
+var gasRequiredByTestRPC = 1000000;
+var defaultDeadline = 1513115725; //Tue, 12 Dec 2017 21:55:25 GMT
+$scope.projHash = {}; // model of a project to be used by UI
 
 window.App = {
   start: function() {
@@ -52,48 +25,12 @@ window.App = {
 
     FundingHub.setProvider(web3.currentProvider);
     IProject.setProvider(web3.currentProvider);
-    _gasPrice = web3.toWei(5, "Shannon");
-    $scope.deadline = 1513115725;
+    $scope.deadline = defaultDeadline;
+    $scope.accounts = [];
 
-    FundingHub.deployed().then(function(_instance) {
-
-    updateProjList();
-
-      var prj;
-      var data;
-
-      _instance.NewProjectEvent().watch(function(e,r) {
-
-          updateAccounts();
-
-          IProject.at(r.args.newProject)
-          .then(function(r){
-            prj = r;
-            return r.projectData.call()
-          })
-          .then(function (_data) {
-            data = _data;
-            console.log("created " + prj.address);
-            return data.push(prj.address);
-          })
-          .then(function(r){
-            return prj.ContribEvent().watch(updateAfterContribEvent);
-          })
-          .then(function(r){
-            return prj.DeactivateEvent().watch(deleteProjectFromList);
-          })
-          .then(function (r) {
-            return web3.eth.getBalance(prj.address).toString(10);
-          })
-          .then(function (balance) {
-            data.push(balance);
-            $scope.projHash[prj.address] = {address: prj.address, owner: data[0], deadline: data[2], target: data[1], balance: balance};
-            console.log($scope.projHash);
-            $scope.projsToFundLabel = 'Projects to fund';
-            $scope.$apply();
-            return;
-          })
-      });
+    FundingHub.deployed().then(function(_fundingHub) {
+      updateProjList();
+      _fundingHub.NewProjectEvent().watch(newProject);
     });
 
     // Get the initial account balance so it can be displayed.
@@ -108,128 +45,151 @@ window.App = {
         return;
       }
 
-      accs.map(x => accounts.push({number:x}));
-      account = accounts[0];
-
+      accs.map(x => $scope.accounts.push({number:x}));
       updateAccounts();
     });
   }
 };
 
-function updateAccounts() {
+/********************************************
+ * functions to be called upon receiving events
+ */
 
-  function addBalance(account) {
-    account.balance = web3.eth.getBalance(account.number).toString(10);
-    return account;
-  }
+// called after a NewProjectEvent is received
+// from the funding hub
+function newProject(e,r) {
+    IProject.at(r.args.newProject)
+    .then(function(_prj){
+      subscribeAndGetData(_prj);
+      updateAccounts();
+      $scope.$apply(); // update the UI
+      return;
+    });
+}
 
-  Promise.all(
-    accounts.map(addBalance)
-  )
+// called after a ContribEvent is received
+// from a project
+function updateAfterContribEvent(e,r) {
+  var address = r.address;
+  updateAccounts();
 
-  $scope.accounts=accounts;
+  return web3.eth.getBalance(address, function(e,r){
+    try {
+      $scope.projHash[address].balance = r.toString();
+    }
+    catch (e) {
+      console.log(e); // this may fail if the project no longer exists
+                      // if so it is safe to ignore it
+    }
+    $scope.$apply(); // update the UI
+  });
+};
+
+// called after a DeactivateEvent is received
+// from a project
+function deleteProjectFromList(e,r) {
+  alert("Project " + r.address +
+        "\nhas been deactivated. \n\nIt will now be deleted from the list of projects");
+  delete $scope.projHash[r.address];
   $scope.$apply();
+};
+
+/************************************************
+ * Some housekeeping functions to update the model
+ * behind the UI when things change
+ */
+function updateAccounts() {
+  function updateBalance(_account) {
+    _account.balance = web3.eth.getBalance(_account.number).toString(10);
+    return _account;
+  }
+  Promise.all(
+    $scope.accounts.map(updateBalance)
+  )
+  $scope.$apply(); // update the UI
 }
 
 function updateProjList() {
+  var fundingHub;
+  var allProjects;
 
-  var instance;
-  var projects;
-  var liveProjs;
-  var numProjs;
-  var projHash = {};
-
-  return FundingHub.deployed().then(function(_instance) {
-    instance = _instance;
-    console.log(instance);
-    return instance.numberOfProjects.call();
+  return FundingHub.deployed().then(function(_fundingHub) {
+    fundingHub = _fundingHub;
+    return fundingHub.allProjects.call();
   })
-  .then(function(_numProjs) {
-    numProjs = _numProjs;
-    console.log("num projs:" + numProjs);
+  .then(function(_projects) { // all projects, active and inactive
+    allProjects = _projects;
     return Promise.all(
-      Array(numProjs.toNumber()).fill().map(instance.getProjectListElement.call)
+      _projects.map(fundingHub.isActive.call)
     );
   })
-  .then(function(_projects) {
-    projects = _projects;
-    return Promise.all(
-      projects.map(instance.isActive.call)
-    );
-  })
-  .then(function(active) {
-    console.log("about to filter");
-
+  .then(function(active) { // 'active' is an array of true/false values
     function filterFunc (address) {
-      return active[projects.indexOf(address)];
+      return active[allProjects.indexOf(address)];
     }
-
-    return projects.filter(filterFunc);
-  })
-  .then(function(projects) {
-    console.log("filtered");
-    liveProjs = projects;
-
+    return allProjects.filter(filterFunc);
+  })  // the filter returns an array of active projects
+  .then(function(_liveProjects) {
     return Promise.all(
-      projects.map(IProject.at)
+      _liveProjects.map(IProject.at)
     )
   })
-   .then(function(projectList) {
-    console.log(projectList);
-
-    function append(_prj) {
-      var prj = _prj;
-      var data;
-
-      return prj.projectData.call()
-      .then(function(_data){
-        data = _data
-        return prj.FundedEvent().watch(updateAfterFundedEvent);
-      })
-      .then(function(r){
-        return prj.ContribEvent().watch(updateAfterContribEvent);
-      })
-      .then(function (r) {
-        projHash[prj.address] = {address: prj.address,
-        owner: data[0],
-        target: data[1].toString(10),
-        deadline: data[2].toString(10)}
-        data.push(prj.address);
-        return data;
-      })
-    }
-
+  .then(function(_liveProjectContractList) {
     return Promise.all(
-      projectList.map(append)
+      _liveProjectContractList.map(subscribeAndGetData)
     )
   })
-  .then(function(projData) {
-
-    function addBalance(projData) {
-       projData.push(web3.eth.getBalance(projData[3]).toString(10));
-       projHash[projData[3]].balance = projData[4];
-       return projData;
-    }
-
-    return Promise.all(
-      projData.map(addBalance)
-    )
-  })
-  .then(function(projData) {
-    console.log(projData);
-    $scope.projHash = projHash;
+  .then(function(r) {
     return $scope.$apply();
   });
 };
 
-////////////////////////////////////////////////
-// controller functions
+/******
+ * This function subscribes to events
+ * produced by the project and puts
+ * its data into a hash for the UI model
+ */
+function subscribeAndGetData(_prj) {
+  var prj = _prj;
+  var data;
+  var projDataHash = {};
+
+  return prj.projectData.call()
+  .then(function(_data){
+    data = _data
+    return prj.DeactivateEvent().watch(deleteProjectFromList);
+  })
+  .then(function(r){
+    return prj.ContribEvent().watch(updateAfterContribEvent);
+  })
+  .then(function (r) {
+    return web3.eth.getBalance(prj.address).toString(10);
+  })
+  .then(function (balance) {
+    $scope.projHash[prj.address] = {address: prj.address,
+    owner: data[0],
+    target: data[1].toString(10),
+    deadline: data[2].toString(10),
+    balance: balance}
+    $scope.$apply();
+    return;
+  });
+}
+
+/********************************
+ * Angular controller functions
+ */
 
 $scope.createProject = function() {
   FundingHub.deployed().then(function(instance) {
-    console.log("account: " + account);
-    return instance.createProject($scope.newProjectOwner.number,$scope.target,$scope.deadline, {from:$scope.newProjectOwner.number, gas:1000000});
-  }) // what if there's an error
+    return instance.createProject($scope.newProjectOwner.number,
+                                  $scope.target,
+                                  $scope.deadline,
+                                  {from:$scope.newProjectOwner.number, gas:gasRequiredByTestRPC});
+  })
+  .catch(function(error) {
+    alert("Error creating project.");
+  })
   .then(function(r) {
     updateAccounts();
     $scope.$apply();
@@ -238,12 +198,16 @@ $scope.createProject = function() {
 
 $scope.fundProject = function(proj) {
   $scope.projs
-  console.log("proj to fund: " + proj);
   var instance;
   FundingHub.deployed()
   .then(function(_instance) {
     instance = _instance;
-    return instance.contribute(proj, {from:$scope.account.number, value:$scope.amount, gas:1000000});
+    return instance.contribute(proj, {from:$scope.account.number,
+                                      value:$scope.amount,
+                                      gas:gasRequiredByTestRPC});
+  })
+  .catch(function(error) {
+    alert("There has been an error making the contribution.");
   })
   .then(function(r) {
     updateAccounts();
@@ -251,8 +215,13 @@ $scope.fundProject = function(proj) {
   })
 }
 
-// end of controller functions
-//////////////////////////////////////////////////////////
+/* end of controller functions
+/*******************************/
+
+
+/********
+ * Remainder of boilerplate code from sample Truffle appear
+ */
 
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)

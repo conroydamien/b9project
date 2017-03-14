@@ -29,6 +29,10 @@ contract FundingHub is Mortal {
       address newProject
   );
 
+  function allProjects() public returns (IProject[]) {
+    return projSet.projects;
+  }
+
   /**
    * @return the number of projects attached to this hub
    */
