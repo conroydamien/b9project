@@ -42,28 +42,14 @@ contract Project is IProject {
 	}
 
   /**
-	 * @return the owner of this project
-	 */
-  function projectOwner() public returns(address) {
-    return projectData.projectOwner;
-  }
-
-  /**
-	 * @return the number of contributors to this project
-	 */
-  function numberOfContributors() public returns(uint){
-		return contributors.length;
-	}
-
-  /**
 	 * Contribute to this project and attribute the contribution to the sender
 	 *
 	 *  @param _sender the address of the sender that called the funding hub
 	 */
 	function fund(address _sender) payable nonZeroModifier refundIfPastDeadline {
-    // for new contributors
     ContribEvent();
 
+    // for new contributors
 		if(contributorBalance[_sender] == 0){ // no existing balance for this contributor
 			contributors.push(_sender); // add to the array of contributors
 			contributorBalance[_sender] = 0; // initialise balance to zero
@@ -74,8 +60,9 @@ contract Project is IProject {
 		  	uint excess = this.balance - projectData.targetAmount;
 		    bool retVal = _sender.send(excess);
         if (!(retVal)) { throw; }
-        // if the excess was successfully returned
         // may break principle of calling external function last
+        // however, contributor balance shouldn't be reduced
+        // if refund of excess fails
 			  contributorBalance[_sender] -= excess;
    		  payout();
 		} else if (this.balance < projectData.targetAmount) {
@@ -96,6 +83,10 @@ contract Project is IProject {
   /**
 	 * Refund all funds to the correct contributor
 	 * and kill this project.
+   *
+   * TODO: This function is public for testing purposes
+   * because triggering a refund via the deadline in the
+   * tests wasn't possible, in production it should be internal
 	 */
 	function refund() public {
     if(this.balance > 0) {

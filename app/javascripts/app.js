@@ -29,7 +29,7 @@ window.App = {
     $scope.accounts = [];
 
     FundingHub.deployed().then(function(_fundingHub) {
-      updateProjList();
+      updateProjectList();
       _fundingHub.NewProjectEvent().watch(newProject);
     });
 
@@ -46,7 +46,7 @@ window.App = {
       }
 
       accs.map(x => $scope.accounts.push({number:x}));
-      updateAccounts();
+      updateAccountList();
     });
   }
 };
@@ -60,8 +60,8 @@ window.App = {
 function newProject(e,r) {
     IProject.at(r.args.newProject)
     .then(function(_prj){
-      subscribeAndGetData(_prj);
-      updateAccounts();
+      subscribeToProjectEventsAndGetData(_prj);
+      updateAccountList();
       $scope.$apply(); // update the UI
       return;
     });
@@ -71,7 +71,7 @@ function newProject(e,r) {
 // from a project
 function updateAfterContribEvent(e,r) {
   var address = r.address;
-  updateAccounts();
+  updateAccountList();
 
   return web3.eth.getBalance(address, function(e,r){
     try {
@@ -98,7 +98,7 @@ function deleteProjectFromList(e,r) {
  * Some housekeeping functions to update the model
  * behind the UI when things change
  */
-function updateAccounts() {
+function updateAccountList() {
   function updateBalance(_account) {
     _account.balance = web3.eth.getBalance(_account.number).toString(10);
     return _account;
@@ -109,7 +109,7 @@ function updateAccounts() {
   $scope.$apply(); // update the UI
 }
 
-function updateProjList() {
+function updateProjectList() {
   var fundingHub;
   var allProjects;
 
@@ -136,7 +136,7 @@ function updateProjList() {
   })
   .then(function(_liveProjectContractList) {
     return Promise.all(
-      _liveProjectContractList.map(subscribeAndGetData)
+      _liveProjectContractList.map(subscribeToProjectEventsAndGetData)
     )
   })
   .then(function(r) {
@@ -149,7 +149,7 @@ function updateProjList() {
  * produced by the project and puts
  * its data into a hash for the UI model
  */
-function subscribeAndGetData(_prj) {
+function subscribeToProjectEventsAndGetData(_prj) {
   var prj = _prj;
   var data;
   var projDataHash = {};
@@ -191,7 +191,7 @@ $scope.createProject = function() {
     alert("Error creating project.");
   })
   .then(function(r) {
-    updateAccounts();
+    updateAccountList();
     $scope.$apply();
   });
 };
@@ -210,14 +210,13 @@ $scope.fundProject = function(proj) {
     alert("There has been an error making the contribution.");
   })
   .then(function(r) {
-    updateAccounts();
+    updateAccountList();
     $scope.$apply();
   })
 }
 
 /* end of controller functions
 /*******************************/
-
 
 /********
  * Remainder of boilerplate code from sample Truffle appear

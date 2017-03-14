@@ -25,7 +25,6 @@ contract IProject is Mortal {
 	function fund(address _address) public payable {}
 	function payout() internal {}
 	function refund() public {} // public for testing purposes
-	function projectOwner() public returns(address) {}
 
 	struct ProjectData {
 		address projectOwner; // address of project owner

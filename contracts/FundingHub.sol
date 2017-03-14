@@ -10,56 +10,39 @@ import "./std/Mortal.sol";
 
 contract FundingHub is Mortal {
 
+  // delegated to for management of the set of projects
   ProjectSetManager.ProjectSet projSet;
 
   /**
-   * may be used for debugging
+   * Fired if a new project is created on this hub
    */
-  event DebugEvent(
-     string message,
-     address recipient
-  );
-
-  event DebugIntEvent(
-      string message,
-      uint value
-  );
-
   event NewProjectEvent(
       address newProject
   );
 
+ /**
+  * @return a list of all projects attached to this hub
+  */
   function allProjects() public returns (IProject[]) {
     return projSet.projects;
   }
 
   /**
-   * @return the number of projects attached to this hub
+   * @param _project The project to be checked for active status
+   * @return true if the project is active, false otherwise
    */
-  function numberOfProjects() public returns (uint){
-    return ProjectSetManager.length(projSet);
-	}
-
-  function isActive(IProject project) public returns (bool){
-    return ProjectSetManager.isActive(projSet, project);
-  }
-
-  /**
-   * Returns a project given its index in the array.
-   *
-   * @param _index the index of the project in 'projects'
-   * @return the project at that index.
-   */
-  function getProjectListElement(uint _index) returns (IProject){
-    return ProjectSetManager.get(projSet, _index);
+  function isActive(IProject _project) public returns (bool){
+    return ProjectSetManager.isActive(projSet, _project);
   }
 
   /**
    * Returns a new IProject implementation
    *
-   * param _owner The address of the account to which funds will
+   * @param _owner The address of the account to which funds will
    *                be released.
-   * return the address of the contract for the project created.
+   * @param _target The amount to be raised.
+   * @param _deadline If the target is not hit by deadline then refund
+   * @return the address of the contract for the project created.
    */
 	function createProject(address _owner, uint _target, uint _deadline) public returns (IProject){
     IProject project = new Project(_owner, _target, _deadline);
@@ -82,7 +65,7 @@ contract FundingHub is Mortal {
       _recipient.fund.value(contribution)(contributor);
 
      // typically the external call should be the last call (CIE principle)
-     // however, we must fund the project before checking the balance
+     // however, we must fund the project before checking its balance
 
       if (_recipient.balance == 0) { // it's been funded or refunded
         ProjectSetManager.tagAsInactive(projSet, _recipient);
