@@ -50,3 +50,11 @@ h3 {
 .hint {
   color: #666;
 }
+
+.table-striped > tbody > tr:nth-child(odd) > td {
+    background-color: white;
+}
+
+.table-striped > tbody > tr:nth-child(even) > td {
+    background-color: lightgrey;
+}

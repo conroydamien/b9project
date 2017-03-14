@@ -6,28 +6,6 @@ import "./IProject.sol";
 
 contract Project is IProject {
 
-  event ContribEvent(
-  );
-
-  /**
-   * may be useful during debugging
-   */
-  event DebugEvent(
-    string message
-  );
-
-  /**
-   * Notify any listeners that this project has been funded
-   */
-  event FundedEvent(
-  );
-
-  /**
-   * Notify any listeners that this project has been refunded
-   */
-  event RefundedEvent(
-  );
-
   /**
    * don't bother if the amount is 0
    * it would just create a bogus contributor
@@ -48,8 +26,6 @@ contract Project is IProject {
     }
     _;
 	}
-
-  ProjectData public projectData; // projectOwner, targetAmount and deadline
 
 	mapping(address => uint) public contributorBalance; // balances are tracked, rather than contributions
 	address[] contributors; // keep a list of contributors as the keys of the hash cannot be listed
@@ -113,7 +89,7 @@ contract Project is IProject {
 	 * Payout the funds to the owner and kill this project.
 	 */
 	function payout() internal {
-    FundedEvent();
+    DeactivateEvent();
 		selfdestruct(projectData.projectOwner); // There are other options - this seems like the cleanest
 	}
 
@@ -122,7 +98,6 @@ contract Project is IProject {
 	 * and kill this project.
 	 */
 	function refund() public {
-    RefundedEvent();
     if(this.balance > 0) {
       address contributor;
       bool retVal;
@@ -132,6 +107,7 @@ contract Project is IProject {
 				if (!(retVal)) { throw; }
 			}
 		}
+    DeactivateEvent();
 		selfdestruct(projectData.projectOwner);
 	}
 }

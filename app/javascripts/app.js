@@ -7,17 +7,14 @@ import { default as contract } from 'truffle-contract'
 
 // Import our contract artifacts and turn them into usable abstractions.
 import fundinghub_artifacts from '../../build/contracts/FundingHub.json'
-import project_artifacts from '../../build/contracts/Project.json'
+import iproject_artifacts from '../../build/contracts/IProject.json'
 
 var app = angular.module('myApp', []);
 app.controller('myCtrl', function($scope) {
 
 var FundingHub = contract(fundinghub_artifacts);
-var Project = contract(project_artifacts);
+var IProject = contract(iproject_artifacts);
 
-// The following code is simple to show off interacting with your contracts.
-// As your needs grow you will likely need to change its form and structure.
-// For application bootstrapping, check out window.addEventListener below.
 var accounts = [];
 var account;
 var _gasPrice;
@@ -44,21 +41,17 @@ function updateAfterContribEvent(e,r) {
   });
 };
 
-function updateAfterFundedEvent(e,r) {
-  var address = r.address;
-  console.log("funded");
-  delete $scope.projHash[address];
+function deleteProjectFromList(e,r) {
+  delete $scope.projHash[r.address];
   $scope.$apply();
 };
-
-
 
 window.App = {
   start: function() {
     var self = this;
 
     FundingHub.setProvider(web3.currentProvider);
-    Project.setProvider(web3.currentProvider);
+    IProject.setProvider(web3.currentProvider);
     _gasPrice = web3.toWei(5, "Shannon");
     $scope.deadline = 1513115725;
 
@@ -73,7 +66,7 @@ window.App = {
 
           updateAccounts();
 
-          Project.at(r.args.newProject)
+          IProject.at(r.args.newProject)
           .then(function(r){
             prj = r;
             return r.projectData.call()
@@ -87,7 +80,7 @@ window.App = {
             return prj.ContribEvent().watch(updateAfterContribEvent);
           })
           .then(function(r){
-            return prj.FundedEvent().watch(updateAfterFundedEvent);
+            return prj.DeactivateEvent().watch(deleteProjectFromList);
           })
           .then(function (r) {
             return web3.eth.getBalance(prj.address).toString(10);
@@ -96,6 +89,7 @@ window.App = {
             data.push(balance);
             $scope.projHash[prj.address] = {address: prj.address, owner: data[0], deadline: data[2], target: data[1], balance: balance};
             console.log($scope.projHash);
+            $scope.projsToFundLabel = 'Projects to fund';
             $scope.$apply();
             return;
           })
@@ -177,7 +171,7 @@ function updateProjList() {
     liveProjs = projects;
 
     return Promise.all(
-      projects.map(Project.at)
+      projects.map(IProject.at)
     )
   })
    .then(function(projectList) {
@@ -198,8 +192,8 @@ function updateProjList() {
       .then(function (r) {
         projHash[prj.address] = {address: prj.address,
         owner: data[0],
-        target: data[1],
-        deadline: data[2]}
+        target: data[1].toString(10),
+        deadline: data[2].toString(10)}
         data.push(prj.address);
         return data;
       })
@@ -235,7 +229,7 @@ $scope.createProject = function() {
   FundingHub.deployed().then(function(instance) {
     console.log("account: " + account);
     return instance.createProject($scope.newProjectOwner.number,$scope.target,$scope.deadline, {from:$scope.newProjectOwner.number, gas:1000000});
-  })
+  }) // what if there's an error
   .then(function(r) {
     updateAccounts();
     $scope.$apply();

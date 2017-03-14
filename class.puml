@@ -1,0 +1,62 @@
+@startuml
+
+top to bottom direction
+
+package "Deployed to TestRPC with Truffle" {
+
+package Wallet {
+Account << (A, green) >>
+}
+
+package Contracts/Solidity {
+
+package "Project / IProject related entities" #DDDDDD {
+Project << (C,lightgreen) Contract>>
+ContribEvent << (E, red) Event>>
+DeactivateEvent << (E, red) Event>>
+IProject << (C, lightgreen) Contract>>
+}
+
+package "FundingHub related entities" #DDDDDD{
+FundingHub << (C,lightgreen) Contract>>
+CreateEvent << (E, red) Event>>
+ProjectSetManager << (L, lightgreen) Library>>
+}
+
+ProjectSetManager *--> IProject
+
+Project -u-|> IProject
+IProject *--> ContribEvent
+IProject --> DeactivateEvent
+
+FundingHub *--> IProject
+FundingHub *--> Project
+FundingHub *-u-> CreateEvent
+}
+}
+
+package "Deployed with Webpack" {
+package WebApp #DDDDDD {
+app << (C, blue) AngularJS Controller>>
+index << (V, blue) AngularJS View>>
+index --> app
+}
+web3 << (L, lightblue)Web3 Library>>
+AngularJS << (L, lightblue)AngularJS Library>>
+}
+
+app -l-> FundingHub
+app *--> IProject
+app *--> Account
+app .u.> CreateEvent
+app ..> ContribEvent
+app ..> DeactivateEvent
+app --> web3
+index --> web3
+index -l-> AngularJS
+browser << (W, lightblue) Web Browser>>
+browser -l-> index
+FundingHub -l-> ProjectSetManager
+
+
+@enduml
