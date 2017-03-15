@@ -45,7 +45,7 @@ The project consists of the following entities:
   * __IProject__
 
         IProject is an abstract contract that declares the functions and struct required of a project for the final exam. It also defines two types of event - ContribEvent and DeactivateEvent.
-  * __Project__
+  * __Project (and modifiers nonZeroModifier and refundIfPastDeadline)__
   
         Project is an implementation of the IProject contract.
 * __Events__
@@ -69,3 +69,23 @@ The project consists of the following entities:
         The application has one controller. The controller is based on the Truffle ``app.js`` file which is adapted to be an AngularJS controller. The ``app.js`` file also contains all the client-side logic for rendering the user interface and employs the web3 library to interact with TestRPC. The controller subscribes to all events emitted by the contracts.
 
 ![](docs/class.png)
+
+## Other final project specifics
+
+* __Testing__
+
+    A test of the refund functionality is provided in a file called ``refunds.js`` in the ``test`` directory. It relies on [``promisifyWeb3.js``](https://gist.github.com/xavierlepretre/90f0feafccc07b267e44a87050b95caa#file-promisifyweb3-js) which is also checked in in the same directory. __For testing purposes the ``refund()`` method of the IProject and Project contracts is ``public``.__ This is because it was difficult to replicate the passing deadline in the tests and __is a vulnerability__ until it is changed. There is a TODO: comment in the code.
+    
+* __Migration__
+
+    The Truffle migration task calls the ``createProject`` method of the funding hub to create the first project. See the ``2_deploy_contracts.js`` file in the ``migrations`` directory.
+    
+## Other notes
+
+* __send/withdraw decision__
+
+    In order to keep the user interface / controller relatively simple the contracts ``send`` funds (or ``selfdestruct``) rather than providing a withdrawl function.    
+
+* __Mortal__
+
+    All contracts are mortal.
