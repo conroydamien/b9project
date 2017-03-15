@@ -20,10 +20,10 @@ contract Project is IProject {
 	/**
    * don't accept funds past the deadline
 	 */
-	modifier refundIfPastDeadline(address _sender) {
+	modifier refundIfPastDeadline() {
     if (now > projectData.deadline) {
-      bool retVal = _sender.send(msg.value);
-      if (!(retVal)) { throw; }
+      // no need to explicitly refund the 'after-deadline'
+      // sender as payable function is not called.
       refund();
     }
     _;
@@ -48,7 +48,7 @@ contract Project is IProject {
 	 *
 	 *  @param _sender the address of the sender that called the funding hub
 	 */
-	function fund(address _sender) payable nonZeroModifier refundIfPastDeadline(_sender) {
+	function fund(address _sender) payable nonZeroModifier refundIfPastDeadline {
     // for new contributors
 		if(contributorBalance[_sender] == 0){ // no existing balance for this contributor
 			contributors.push(_sender); // add to the array of contributors
@@ -87,7 +87,7 @@ contract Project is IProject {
    *
    * TODO: This function is public for testing purposes
    * because triggering a refund via the deadline in the
-   * tests wasn't possible, in production it should be internal
+   * tests was very difficult, in production it should be internal
 	 */
 	function refund() public {
     if(this.balance > 0) {
