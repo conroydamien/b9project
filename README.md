@@ -49,17 +49,23 @@ The project consists of the following entities:
   
         Project is an implementation of the IProject contract.
 * __Events__
-  * __NewProjectEvent__
+  * __NewProjectEvent (defined in FundingHub)__
   
         A NewProjectEvent is emitted by the funding hub when a new project is created.
-  * __ContribEvent__
+  * __ContribEvent (defined in IProject)__
   
         A ContribEvent is emitted by a project when a contribution is made to the project. It prompts the user interface to update and reflect the contribution.
 
-  * __DeactivateEvent__
+  * __DeactivateEvent (defined in IProject)__
   
         A DeactivateEvent is emitted by a project that is fully funded or refunded. It prompts the user interface to update and remove the project from the project list. It also prompts the user interface to alert the user to the deactivation with a reason: 'funded' or 'refunded'. 
-* Views
-* Controllers
+* __Views__
+  * __index.html__
+  
+        The application has one view, ``index.html`` which is an AngularJS view.
+* __Controllers__
+  * __app.js__
+  
+        The application has one controller. The controller is based on the Truffle ``app.js`` file which is adapted to be an AngularJS controller. The ``app.js`` file also contains all the client-side logic for rendering the user interface and employs the web3 library to interact with TestRPC. The controller subscribes to all events emitted by the contracts.
 
 ![](docs/class.png)
