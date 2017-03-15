@@ -1,5 +1,7 @@
 # Damien Conroy - final project 
 
+The project repository is at: https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy
+
 ## Getting started
 This is a project created with Truffle v3.1.2 and Webpack using AngularJS with TestRPC as the target client.
 Please see [the Truffle 3 guide](http://truffleframework.com/tutorials/building-testing-frontend-app-truffle-3) for more detail.
