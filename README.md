@@ -41,13 +41,13 @@ The interface will update to reflect changes to accounts and projects after proj
 The project consists of the following entities:
 
 * __Contracts__
-  * __FundingHub (and the ProjectSetManager library)__
+  * __[FundingHub](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/FundingHub.sol) (and the [ProjectSetManager](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/ProjectSetManager.sol) library)__
   
         The FundingHub contract is used to create and manage projects. It delegates management of the project list to the ProjectSetManager library and emits a NewProjectEvent each time a project is created. It declares the functions required for the final exam.
-  * __IProject__
+  * __[IProject](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol)__
 
         IProject is an abstract contract that declares the functions and struct required of a project for the final exam. It also defines two types of event - ContribEvent and DeactivateEvent.
-  * __Project (and modifiers nonZeroModifier and refundIfPastDeadline)__
+  * __[Project](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol) (and modifiers nonZeroModifier and refundIfPastDeadline)__
   
         Project is an implementation of the IProject contract.
 * __Events__
