@@ -7,7 +7,6 @@ contract('FundingHub', function(accounts) {
   PromisifyWeb3.promisify(web3);
 
   var fundingHub;
-  var projectOwnerAccount = accounts[5];
   var payingAccount = accounts[3];
   var funderAccounts = [accounts[7],
                         accounts[8],
@@ -37,7 +36,7 @@ contract('FundingHub', function(accounts) {
      return FundingHub.new()
      .then(function(_fundingHub) {
        fundingHub = _fundingHub;
-       return fundingHub.createProject(projectOwnerAccount, target, deadline, {from: payingAccount});
+       return fundingHub.createProject(target, deadline, {from: payingAccount});
      })
      .catch(function(error) {
        console.log(error);

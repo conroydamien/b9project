@@ -182,8 +182,7 @@ function subscribeToProjectEventsAndGetData(_prj) {
 
 $scope.createProject = function() {
   FundingHub.deployed().then(function(instance) {
-    return instance.createProject($scope.newProjectOwner.number,
-                                  $scope.target,
+    return instance.createProject($scope.target,
                                   $scope.deadline,
                                   {from:$scope.newProjectOwner.number, gas:gasRequiredByTestRPC});
   })

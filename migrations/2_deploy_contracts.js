@@ -9,15 +9,15 @@ module.exports = function(deployer) {
   deployer.deploy(FundingHub)
   deployer.deploy(IProject);
   deployer.deploy(Project);
+  
   deployer.new(FundingHub);
 
   deployer.then(function(){
     return FundingHub.deployed()
     .then(function(_fundingHub) {
-      var target = 3001;
+      var target = 31644710;
       var deadline = 1513115725; // later in 2017
-      console.log(deployer);
-      return _fundingHub.createProject('0x0', target, deadline);
+      return _fundingHub.createProject(target, deadline);
     });
   });
 };

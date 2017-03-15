@@ -38,14 +38,12 @@ contract FundingHub is Mortal {
   /**
    * Returns a new IProject implementation
    *
-   * @param _owner The address of the account to which funds will
-   *                be released.
    * @param _target The amount to be raised.
    * @param _deadline If the target is not hit by deadline then refund
    * @return the address of the contract for the project created.
    */
-	function createProject(address _owner, uint _target, uint _deadline) public returns (IProject){
-    IProject project = new Project(_owner, _target, _deadline);
+	function createProject(uint _target, uint _deadline) public returns (IProject){
+    IProject project = new Project(msg.sender, _target, _deadline);
     ProjectSetManager.add(projSet, project);
     NewProjectEvent(project);
 		return project; // not visible from Truffle as tx_id is returned
