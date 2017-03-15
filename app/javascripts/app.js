@@ -224,7 +224,7 @@ $scope.fundProject = function(proj) {
 /*******************************/
 
 /********
- * Remainder of boilerplate code from sample Truffle appear
+ * Remainder of boilerplate code from sample Truffle app
  */
 
 window.addEventListener('load', function() {

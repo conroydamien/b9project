@@ -13,7 +13,7 @@ contract Project is IProject {
   modifier nonZeroModifier() {
     if (msg.value == 0) {
       return;
-  }
+    }
     _;
   }
 
@@ -40,7 +40,7 @@ contract Project is IProject {
    *                  avoid a refund (could be checked against 'now')
    */
   function Project(address _owner, uint _target, uint _deadline) {
-  projectData = ProjectData(_owner, _target, _deadline);
+    projectData = ProjectData(_owner, _target, _deadline);
   }
 
   /**
@@ -50,27 +50,27 @@ contract Project is IProject {
    */
   function fund(address _sender) payable nonZeroModifier refundIfPastDeadline {
     // for new contributors
-  if(contributorBalance[_sender] == 0){ // no existing balance for this contributor
-  contributors.push(_sender); // add to the array of contributors
-  contributorBalance[_sender] = 0; // initialise balance to zero
-  }
+    if(contributorBalance[_sender] == 0){ // no existing balance for this contributor
+      contributors.push(_sender); // add to the array of contributors
+      contributorBalance[_sender] = 0; // initialise balance to zero
+    }
 
-  if(this.balance > projectData.targetAmount) {
+    if(this.balance > projectData.targetAmount) {
     // full amount reached - return the excess to the original sender
       uint excess = this.balance - projectData.targetAmount;
       bool retVal = _sender.send(excess);
-        if (!(retVal)) { throw; }
+      if (!(retVal)) { throw; }
         // may break principle of calling external function last
         // however, contributor balance shouldn't be reduced
         // if refund of the excess fails
-    contributorBalance[_sender] -= excess;
-         payout();
-  } else if (this.balance < projectData.targetAmount) {
-        contributorBalance[_sender] += msg.value;
-        ContribEvent(); // only send event here. payout() sends DeactivateEvent
-  } else { // target reached with no excess
-         payout();
-  }
+      contributorBalance[_sender] -= excess;
+      payout();
+    } else if (this.balance < projectData.targetAmount) {
+      contributorBalance[_sender] += msg.value;
+      ContribEvent(); // only send event here. payout() sends DeactivateEvent
+    } else { // target reached with no excess
+      payout();
+    }
   }
 
   /**
@@ -78,7 +78,7 @@ contract Project is IProject {
    */
   function payout() internal {
     DeactivateEvent("payout");
-  selfdestruct(projectData.projectOwner); // There are other options - this seems like the cleanest
+    selfdestruct(projectData.projectOwner); // There are other options - this seems like the cleanest
   }
 
   /**
@@ -93,13 +93,13 @@ contract Project is IProject {
     if(this.balance > 0) {
       address contributor;
       bool retVal;
-  for(uint i = 0; i < contributors.length; ++i) {
-  contributor = contributors[i];
-  retVal = contributor.send(contributorBalance[contributor]);
-  if (!(retVal)) { throw; }
-  }
-  }
+      for(uint i = 0; i < contributors.length; ++i) {
+        contributor = contributors[i];
+        retVal = contributor.send(contributorBalance[contributor]);
+        if (!(retVal)) { throw; }
+      }
+    }
     DeactivateEvent("refund");
-  selfdestruct(projectData.projectOwner);
+    selfdestruct(projectData.projectOwner);
   }
 }
