@@ -42,19 +42,19 @@ contract FundingHub is Mortal {
    * @param _deadline If the target is not hit by deadline then refund
    * @return the address of the contract for the project created.
    */
-	function createProject(uint _target, uint _deadline) public returns (IProject){
+  function createProject(uint _target, uint _deadline) public returns (IProject){
     IProject project = new Project(msg.sender, _target, _deadline);
     ProjectSetManager.add(projSet, project);
     NewProjectEvent(project);
-		return project; // not visible externally as tx_id is returned
-	}
+  return project; // not visible externally as tx_id is returned
+  }
 
   /**
    * Contributes the amount payable to the project specified.
    *
    * @param _recipient The project to which the amount will be contributed.
    */
-	function contribute(IProject _recipient) payable {
+  function contribute(IProject _recipient) payable {
 
     address contributor = msg.sender;
     uint contribution = msg.value;
@@ -68,7 +68,7 @@ contract FundingHub is Mortal {
       if (_recipient.balance == 0) { // it's been funded or refunded
         ProjectSetManager.tagAsInactive(projSet, _recipient);
       }
-  	}
+    }
     // provide a return value to check success??
-	}
+  }
 }

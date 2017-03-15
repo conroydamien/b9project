@@ -4,34 +4,34 @@ import "./std/Mortal.sol";
 
 contract IProject is Mortal {
 
-	/**
-	 * Notify any listeners that this project has been
-	 * contributed to
-	 */
-	event ContribEvent(
-	);
-
-	/**
-	 * Notify any listeners that this project has been deactivated
-	 */
-	event DeactivateEvent(
-		string message
-	);
+  /**
+   * Notify any listeners that this project has been
+   * contributed to
+   */
+  event ContribEvent(
+  );
 
   /**
-	 * The following four functions and
-	 * struct are project requirements
-	 */
+   * Notify any listeners that this project has been deactivated
+   */
+  event DeactivateEvent(
+  string message
+  );
 
-	function fund(address _address) public payable {}
-	function payout() internal {}
-	function refund() public {} // public for testing purposes
+  /**
+   * The following four functions and
+   * struct are project requirements
+   */
 
-	struct ProjectData {
-		address projectOwner; // address of project owner
-		uint targetAmount;    // amount to be raised
-		uint deadline;        // deadline - can't contribute beyond this time
-	}
+  function fund(address _address) public payable {}
+  function payout() internal {}
+  function refund() public {} // public for testing purposes
 
-	ProjectData public projectData; // projectOwner, targetAmount and deadline
+  struct ProjectData {
+  address projectOwner; // address of project owner
+  uint targetAmount;    // amount to be raised
+  uint deadline;        // deadline - can't contribute beyond this time
+  }
+
+  ProjectData public projectData; // projectOwner, targetAmount and deadline
 }
