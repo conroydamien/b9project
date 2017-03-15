@@ -46,7 +46,7 @@ contract FundingHub is Mortal {
     IProject project = new Project(msg.sender, _target, _deadline);
     ProjectSetManager.add(projSet, project);
     NewProjectEvent(project);
-  return project; // not visible externally as tx_id is returned
+    return project; // not visible externally as tx_id is returned
   }
 
   /**
