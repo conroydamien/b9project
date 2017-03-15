@@ -71,7 +71,6 @@ function newProject(e,r) {
 // from a project
 function updateAfterContribEvent(e,r) {
   var address = r.address;
-  updateAccountList();
 
   return web3.eth.getBalance(address, function(e,r){
     try {
@@ -81,6 +80,7 @@ function updateAfterContribEvent(e,r) {
       console.log(e); // this may fail if the project no longer exists
                       // if so it is safe to ignore it
     }
+    updateAccountList();
     $scope.$apply(); // update the UI
   });
 };
@@ -88,9 +88,12 @@ function updateAfterContribEvent(e,r) {
 // called after a DeactivateEvent is received
 // from a project
 function deleteProjectFromList(e,r) {
+  console.log(r);
   alert("Project " + r.address +
-        "\nhas been deactivated. \n\nIt will now be deleted from the list of projects");
+        "\nhas been deactivated. \n\nIt will now be deleted from the list of projects" +
+        "\n\nReason: " + r.args.message);
   delete $scope.projHash[r.address];
+  updateAccountList();
   $scope.$apply();
 };
 
@@ -120,6 +123,9 @@ function updateProjectList() {
   .then(function(_projects) { // all projects, active and inactive
     allProjects = _projects;
     return Promise.all(
+      // it may be cheaper to get an array of true/false
+      // values from the fundingHub, however, the values
+      // might be updated by another client
       _projects.map(fundingHub.isActive.call)
     );
   })

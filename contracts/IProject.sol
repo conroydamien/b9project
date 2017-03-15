@@ -15,6 +15,7 @@ contract IProject is Mortal {
 	 * Notify any listeners that this project has been deactivated
 	 */
 	event DeactivateEvent(
+		string message
 	);
 
   /**

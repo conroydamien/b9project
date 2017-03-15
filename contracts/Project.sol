@@ -20,8 +20,10 @@ contract Project is IProject {
 	/**
    * don't accept funds past the deadline
 	 */
-	modifier refundIfPastDeadline() {
+	modifier refundIfPastDeadline(address _sender) {
     if (now > projectData.deadline) {
+      bool retVal = _sender.send(msg.value);
+      if (!(retVal)) { throw; }
       refund();
     }
     _;
@@ -46,9 +48,7 @@ contract Project is IProject {
 	 *
 	 *  @param _sender the address of the sender that called the funding hub
 	 */
-	function fund(address _sender) payable nonZeroModifier refundIfPastDeadline {
-    ContribEvent();
-
+	function fund(address _sender) payable nonZeroModifier refundIfPastDeadline(_sender) {
     // for new contributors
 		if(contributorBalance[_sender] == 0){ // no existing balance for this contributor
 			contributors.push(_sender); // add to the array of contributors
@@ -56,17 +56,18 @@ contract Project is IProject {
 		}
 
 		if(this.balance > projectData.targetAmount) {
-			  // return the excess to the original sender
+			  // full amount reached - return the excess to the original sender
 		  	uint excess = this.balance - projectData.targetAmount;
 		    bool retVal = _sender.send(excess);
         if (!(retVal)) { throw; }
         // may break principle of calling external function last
         // however, contributor balance shouldn't be reduced
-        // if refund of excess fails
+        // if refund of the excess fails
 			  contributorBalance[_sender] -= excess;
    		  payout();
 		} else if (this.balance < projectData.targetAmount) {
   			contributorBalance[_sender] += msg.value;
+        ContribEvent(); // only send event here. payout() sends DeactivateEvent
 		} else { // target reached with no excess
  	  		payout();
 		}
@@ -76,7 +77,7 @@ contract Project is IProject {
 	 * Payout the funds to the owner and kill this project.
 	 */
 	function payout() internal {
-    DeactivateEvent();
+    DeactivateEvent("payout");
 		selfdestruct(projectData.projectOwner); // There are other options - this seems like the cleanest
 	}
 
@@ -98,7 +99,7 @@ contract Project is IProject {
 				if (!(retVal)) { throw; }
 			}
 		}
-    DeactivateEvent();
+    DeactivateEvent("refund");
 		selfdestruct(projectData.projectOwner);
 	}
 }
