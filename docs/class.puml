@@ -19,7 +19,7 @@ IProject << (C, lightgreen) Contract>>
 
 package "FundingHub related entities" #DDDDDD{
 FundingHub << (C,lightgreen) Contract>>
-CreateEvent << (E, red) Event>>
+NewProjectEvent << (E, red) Event>>
 ProjectSetManager << (L, lightgreen) Library>>
 }
 
@@ -31,7 +31,7 @@ IProject --> DeactivateEvent
 
 FundingHub *--> IProject
 FundingHub *--> Project
-FundingHub *-u-> CreateEvent
+FundingHub *-u-> NewProjectEvent
 }
 }
 
@@ -48,7 +48,7 @@ AngularJS << (L, lightblue)AngularJS Library>>
 app -l-> FundingHub
 app *--> IProject
 app *--> Account
-app .u.> CreateEvent
+app .u.> NewProjectEvent
 app ..> ContribEvent
 app ..> DeactivateEvent
 app --> web3
