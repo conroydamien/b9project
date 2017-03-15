@@ -11,7 +11,7 @@ Please ensure that other applications that may provide web3 to the browser (such
 
 ## Using the application
 Visit `localhost:8080`. The screen should look similar to the following:
-![screenshot](docs/screenshot.png)
+        ![screenshot](docs/screenshot.png)
 
 ### Accounts
 The application uses the accounts provided by TestRPC. When the application starts, the first account in the list will have paid to have the application set up and its balance will be slightly lower than the others. 
@@ -38,11 +38,27 @@ The interface will update to reflect changes to accounts and projects after proj
 ## Contracts, Events, Views and Controllers
 The project consists of the following entities:
 
-* Contracts
-  * FundingHub
+* __Contracts__
+  * __FundingHub (and the ProjectSetManager library)__
   
-        The FundingHub contract is used to create and manage projects. It delegates management of the project list to the ProjectSetManager library and emits a NewProjectEvent each time a project is created.
-* Events
+        The FundingHub contract is used to create and manage projects. It delegates management of the project list to the ProjectSetManager library and emits a NewProjectEvent each time a project is created. It declares the functions required for the final exam.
+  * __IProject__
+
+        IProject is an abstract contract that declares the functions and struct required of a project for the final exam. It also defines two types of event - ContribEvent and DeactivateEvent.
+  * __Project__
+  
+        Project is an implementation of the IProject contract.
+* __Events__
+  * __NewProjectEvent__
+  
+        A NewProjectEvent is emitted by the funding hub when a new project is created.
+  * __ContribEvent__
+  
+        A ContribEvent is emitted by a project when a contribution is made to the project. It prompts the user interface to update and reflect the contribution.
+
+  * __DeactivateEvent__
+  
+        A DeactivateEvent is emitted by a project that is fully funded or refunded. It prompts the user interface to update and remove the project from the project list. It also prompts the user interface to alert the user to the deactivation with a reason: 'funded' or 'refunded'. 
 * Views
 * Controllers
 
