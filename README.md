@@ -39,7 +39,9 @@ The interface will update to reflect changes to accounts and projects after proj
 The project consists of the following entities:
 
 * Contracts
-..* FundingHub
+  * FundingHub
+  
+        The FundingHub contract is used to create and manage projects. It delegates management of the project list to the ProjectSetManager library and emits a NewProjectEvent each time a project is created.
 * Events
 * Views
 * Controllers
