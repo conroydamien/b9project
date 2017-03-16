@@ -51,14 +51,14 @@ The project consists of the following entities:
   
         Project is an implementation of the IProject contract.
 * __Events__
-  * __NewProjectEvent (defined in FundingHub)__
+  * __[NewProjectEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/FundingHub.sol#L20) (defined in FundingHub)__
   
         A NewProjectEvent is emitted by the funding hub when a new project is created.
-  * __ContribEvent (defined in IProject)__
+  * __[ContribEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject#L11) (defined in IProject)__
   
         A ContribEvent is emitted by a project when a contribution is made to the project. It prompts the user interface to update and reflect the contribution.
 
-  * __DeactivateEvent (defined in IProject)__
+  * __[DeactivateEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject#L17) (defined in IProject)__
   
         A DeactivateEvent is emitted by a project that is fully funded or refunded. It prompts the user interface to update and remove the project from the project list. It also prompts the user interface to alert the user to the deactivation with a reason: 'funded' or 'refunded'. 
 * __Views__
