@@ -76,7 +76,7 @@ The project consists of the following entities:
 
 * __Testing__
 
-    A test of the refund functionality is provided in a file called [``refunds.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/test/refunds.js) in the ``test`` directory. It relies on [``promisifyWeb3.js``](https://gist.github.com/xavierlepretre/90f0feafccc07b267e44a87050b95caa#file-promisifyweb3-js) which is also checked in in the same directory. __For testing purposes the ``refund()`` method of the IProject and Project contracts is ``public``.__ This is because it was difficult to replicate the passing deadline in the tests and __is a vulnerability__ until it is changed. There is a TODO: comment in the code.
+    A test of the refund functionality is provided in a file called [``refunds.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/test/refunds.js) in the ``test`` directory. It relies on [``promisifyWeb3.js``](https://gist.github.com/xavierlepretre/90f0feafccc07b267e44a87050b95caa#file-promisifyweb3-js) which is also checked in in the same directory. __For testing purposes the ``refund()`` method of the IProject and Project contracts is ``public``.__ This is because it was difficult to replicate the passing deadline in the tests and __is a vulnerability__ until it is changed. There is a [TODO:](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L88) comment in the code.
     
 * __Migration__
 
@@ -88,6 +88,6 @@ The project consists of the following entities:
 
     In order to keep the user interface / controller relatively simple the contracts ``send`` funds (or ``selfdestruct``) rather than providing a withdrawl function.    
 
-* __Mortal__
+* __[Mortal](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/std/Mortal.sol)__
 
     All contracts are mortal.
