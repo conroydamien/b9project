@@ -54,19 +54,19 @@ The project consists of the following entities:
   * __[NewProjectEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/FundingHub.sol#L20) (defined in FundingHub)__
   
         A NewProjectEvent is emitted by the funding hub when a new project is created.
-  * __[ContribEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject#L11) (defined in IProject)__
+  * __[ContribEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L11) (defined in IProject)__
   
         A ContribEvent is emitted by a project when a contribution is made to the project. It prompts the user interface to update and reflect the contribution.
 
-  * __[DeactivateEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject#L17) (defined in IProject)__
+  * __[DeactivateEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L17) (defined in IProject)__
   
         A DeactivateEvent is emitted by a project that is fully funded or refunded. It prompts the user interface to update and remove the project from the project list. It also prompts the user interface to alert the user to the deactivation with a reason: 'funded' or 'refunded'. 
 * __Views__
-  * __index.html__
+  * __[index.html](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/app/index.html)__
   
         The application has one view, ``index.html`` which is an AngularJS view.
 * __Controllers__
-  * __app.js__
+  * __[app.js](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/app/javascripts/app.js)__
   
         The application has one controller. The controller is based on the Truffle ``app.js`` file which is adapted to be an AngularJS controller. The ``app.js`` file also contains all the client-side logic for rendering the user interface and employs the web3 library to interact with TestRPC. The controller subscribes to all events emitted by the contracts.
 
@@ -76,11 +76,11 @@ The project consists of the following entities:
 
 * __Testing__
 
-    A test of the refund functionality is provided in a file called ``refunds.js`` in the ``test`` directory. It relies on [``promisifyWeb3.js``](https://gist.github.com/xavierlepretre/90f0feafccc07b267e44a87050b95caa#file-promisifyweb3-js) which is also checked in in the same directory. __For testing purposes the ``refund()`` method of the IProject and Project contracts is ``public``.__ This is because it was difficult to replicate the passing deadline in the tests and __is a vulnerability__ until it is changed. There is a TODO: comment in the code.
+    A test of the refund functionality is provided in a file called [``refunds.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/test/refunds.js) in the ``test`` directory. It relies on [``promisifyWeb3.js``](https://gist.github.com/xavierlepretre/90f0feafccc07b267e44a87050b95caa#file-promisifyweb3-js) which is also checked in in the same directory. __For testing purposes the ``refund()`` method of the IProject and Project contracts is ``public``.__ This is because it was difficult to replicate the passing deadline in the tests and __is a vulnerability__ until it is changed. There is a TODO: comment in the code.
     
 * __Migration__
 
-    The Truffle migration task calls the ``createProject`` method of the funding hub to create the first project. See the ``2_deploy_contracts.js`` file in the ``migrations`` directory.
+    The Truffle migration task calls the ``createProject`` method of the funding hub to create the first project. See the [``2_deploy_contracts.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/migrations/2_deploy_contracts.js) file in the ``migrations`` directory.
     
 ## Other notes
 
