@@ -88,7 +88,6 @@ function updateAfterContribEvent(e,r) {
 // called after a DeactivateEvent is received
 // from a project
 function deleteProjectFromList(e,r) {
-  console.log(r);
   alert("Project " + r.address +
         "\nhas been deactivated. \n\nIt will now be deleted from the list of projects" +
         "\n\nReason: " + r.args.message);
