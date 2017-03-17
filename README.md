@@ -41,7 +41,7 @@ The interface will update to reflect changes to accounts and projects after proj
 The project consists of the following entities:
 
 * __Contracts__
-  * __[FundingHub](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/FundingHub.sol) (and the [ProjectSetManager](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/ProjectSetManager.sol) library)__
+  * __[FundingHub](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/FundingHub.sol) (and the [ProjectSetManager](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/ProjectSetManager.sol) library and the [onlyActiveProjects](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/FundingHub.sol#L19) modifier)__
   
         The FundingHub contract is used to create and manage projects. It delegates management of the project list to the ProjectSetManager library and emits a NewProjectEvent each time a project is created. It declares the functions required for the final exam.
   * __[IProject](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol)__
