@@ -65,6 +65,7 @@ contract FundingHub is Mortal {
 
       if(deadline < now || _recipient.balance + contribution >= target)
       {
+        // we've passed the deadline or reached the target
         ProjectSetManager.tagAsInactive(projSet, _recipient);
       } 
 
