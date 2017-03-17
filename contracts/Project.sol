@@ -58,12 +58,9 @@ contract Project is IProject {
     if(this.balance > projectData.targetAmount) {
     // full amount reached - return the excess to the original sender
       uint excess = this.balance - projectData.targetAmount;
+      contributorBalance[_sender] -= excess;
       bool retVal = _sender.send(excess);
       if (!(retVal)) { throw; }
-        // may break principle of calling external function last
-        // however, contributor balance shouldn't be reduced
-        // if refund of the excess fails
-      contributorBalance[_sender] -= excess;
       payout();
     } else if (this.balance < projectData.targetAmount) {
       contributorBalance[_sender] += msg.value;
