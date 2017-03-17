@@ -30,7 +30,7 @@ contract IProject is Mortal {
   struct ProjectData {
     address projectOwner; // address of project owner
     uint targetAmount;    // amount to be raised
-    uint deadline;        // deadline - can't contribute beyond this time
+    uint deadline;        // deadline - contributing beyond this time causes a refund
   }
 
   ProjectData public projectData; // projectOwner, targetAmount and deadline
