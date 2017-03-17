@@ -62,13 +62,13 @@ contract FundingHub is Mortal {
     if(isActive(_recipient)) { // don't pay if there's no project
       _recipient.fund.value(contribution)(contributor);
 
-     // typically the external call should be the last call (CIE principle)
-     // however, we must fund the project before checking its balance
+     // typically the external call should be the last call (Checks, Effects,
+     // Interactions principle) however, we must fund the project before 
+     // checking its balance
 
       if (_recipient.balance == 0) { // it's been funded or refunded
         ProjectSetManager.tagAsInactive(projSet, _recipient);
       }
     }
-    // provide a return value to check success??
   }
 }
