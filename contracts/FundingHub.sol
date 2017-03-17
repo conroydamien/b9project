@@ -17,7 +17,7 @@ contract FundingHub is Mortal {
    * Throw if a project is inactive 
    */
   modifier onlyActiveProjects(IProject _project) {
-    if(!ProjectSetManager.isActive(projSet, _project)){
+    if(!isActive(_project)){
       throw;
     }
     _;
@@ -35,6 +35,14 @@ contract FundingHub is Mortal {
   */
   function allProjects() public returns (IProject[]) {
     return projSet.projects;
+  }
+
+  /**
+   * @param _project The project to be checked for active status
+   * @return true if the project is active, false otherwise
+   */
+  function isActive(IProject _project) public returns (bool){
+    return ProjectSetManager.isActive(projSet, _project);
   }
 
   /**
