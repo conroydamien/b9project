@@ -83,6 +83,9 @@ The project consists of the following entities:
     The Truffle migration task calls the ``createProject`` method of the funding hub to create the first project. See the [``2_deploy_contracts.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/migrations/2_deploy_contracts.js) file in the ``migrations`` directory.
     
 ## Other notes
+* __Projects with deadlines in the past__
+
+    It is possible to create a project with a deadline in the past - the project will be refunded on the first funding event. This is not particularly useful and possibly a waste of gas, however it does mean that a refund (albeit of only one contribution) based on a past deadline can be exercised from the interface without waiting for a real deadline to pass.
 
 * __send/withdraw decision__
 
