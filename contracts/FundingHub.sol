@@ -9,19 +9,19 @@ import "./std/Mortal.sol";
 // contribution to funding projects
 
 contract FundingHub is Mortal {
+  
+  // delegated to for management of the set of projects
+  ProjectSetManager.ProjectSet projSet;
 
   /**
    * Throw if a project is inactive 
    */
   modifier onlyActiveProjects(IProject _project) {
-    if (!isActive(_project)) {
+    if(!ProjectSetManager.isActive(projSet, _project)){
       throw;
     }
     _;
   }
-
-  // delegated to for management of the set of projects
-  ProjectSetManager.ProjectSet projSet;
 
   /**
    * Fired if a new project is created on this hub
@@ -35,14 +35,6 @@ contract FundingHub is Mortal {
   */
   function allProjects() public returns (IProject[]) {
     return projSet.projects;
-  }
-
-  /**
-   * @param _project The project to be checked for active status
-   * @return true if the project is active, false otherwise
-   */
-  function isActive(IProject _project) public returns (bool){
-    return ProjectSetManager.isActive(projSet, _project);
   }
 
   /**
