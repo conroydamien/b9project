@@ -10,6 +10,16 @@ import "./std/Mortal.sol";
 
 contract FundingHub is Mortal {
 
+  /**
+   * Throw if a project is inactive 
+   */
+  modifier onlyActiveProjects(IProject _project) {
+    if (!isActive(_project)) {
+      throw;
+    }
+    _;
+  }
+
   // delegated to for management of the set of projects
   ProjectSetManager.ProjectSet projSet;
 
@@ -54,26 +64,23 @@ contract FundingHub is Mortal {
    *
    * @param _recipient The project to which the amount will be contributed.
    */
-  function contribute(IProject _recipient) payable {
+  function contribute(IProject _recipient) payable onlyActiveProjects(_recipient){
 
     address contributor = msg.sender;
     uint contribution = msg.value;
 
-    if(isActive(_recipient)) { // don't pay if there's no project
+    var (owner, target, deadline) = _recipient.projectData();
 
-      var (owner, target, deadline) = _recipient.projectData();
+    if(deadline < now || _recipient.balance + contribution >= target)
+    {
+      // we've passed the deadline or reached the target
+      ProjectSetManager.tagAsInactive(projSet, _recipient);
+    } 
 
-      if(deadline < now || _recipient.balance + contribution >= target)
-      {
-        // we've passed the deadline or reached the target
-        ProjectSetManager.tagAsInactive(projSet, _recipient);
-      } 
+    // The external call should be the last call (Checks, Effects,
+    // Interactions principle) 
 
-      // The external call should be the last call (Checks, Effects,
-      // Interactions principle) 
+    _recipient.fund.value(contribution)(contributor);
 
-      _recipient.fund.value(contribution)(contributor);
-
-    }
   }
 }
