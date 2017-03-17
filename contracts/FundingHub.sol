@@ -60,15 +60,19 @@ contract FundingHub is Mortal {
     uint contribution = msg.value;
 
     if(isActive(_recipient)) { // don't pay if there's no project
+
+      var (owner, target, deadline) = _recipient.projectData();
+
+      if(deadline < now || _recipient.balance + contribution >= target)
+      {
+        ProjectSetManager.tagAsInactive(projSet, _recipient);
+      } 
+
+      // The external call should be the last call (Checks, Effects,
+      // Interactions principle) 
+
       _recipient.fund.value(contribution)(contributor);
 
-     // typically the external call should be the last call (Checks, Effects,
-     // Interactions principle) however, we must fund the project before 
-     // checking its balance
-
-      if (_recipient.balance == 0) { // it's been funded or refunded
-        ProjectSetManager.tagAsInactive(projSet, _recipient);
-      }
     }
   }
 }
