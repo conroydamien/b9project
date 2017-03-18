@@ -89,7 +89,7 @@ The project consists of the following entities:
 
 * __send/withdraw decision__
 
-    In order to keep the user interface / controller relatively simple the contracts ``send`` funds (or ``selfdestruct``) rather than providing a withdrawl function.    
+    In order to keep the user interface / controller relatively simple the contracts ``send`` funds (or ``selfdestruct``) rather than providing a withdrawl function. I'm not happy with this because the refund has sends in a loop and if one causes a throw then others don't get paid.  
 
 * __[Mortal](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/std/Mortal.sol)__
 
