@@ -93,7 +93,8 @@ contract Project is IProject {
       for(uint i = 0; i < contributors.length; ++i) {
         contributor = contributors[i];
         retVal = contributor.send(contributorBalance[contributor]);
-        if (!(retVal)) { throw; }
+        if (!(retVal)) { throw; } // This is problematic - one contributor causing
+                                  // a failure could result in others not being paid
       }
     }
     DeactivateEvent("refund");
