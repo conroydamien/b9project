@@ -50,7 +50,7 @@ The project consists of the following entities:
   * __[Project](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol) (and modifiers [nonZeroModifier](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L13) and [refundIfPastDeadline](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L23))__
   
         Project is an implementation of the IProject contract.
-* __Events__
+* __Events__ (Because events are used a number of UI clients may be kept updated on the same fundinghub)
   * __[NewProjectEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/FundingHub.sol#L20) (defined in FundingHub)__
   
         A NewProjectEvent is emitted by the funding hub when a new project is created.
