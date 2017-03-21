@@ -89,7 +89,7 @@ The project consists of the following entities:
 
 * __send/withdraw decision__
 
-    ``IProject`` implementations (i.e. ``Project``) provide a ``withdraw`` function. When a project is to be refunded a ``RefundedEvent`` is emitted and the client is responsible for retrieving the contributions from the project by invoking the ``withdraw`` method. This avoids invoking ``send`` operations in a (contract-side) loop. 
+    ``IProject`` implementations (i.e. ``Project``) provide a ``withdraw`` function. When a project is to be refunded a ``RefundEvent`` is emitted and the client is responsible for retrieving the contributions from the project by invoking the ``withdraw`` method. This avoids invoking ``send`` operations in a (contract-side) loop. 
 
 * __[Mortal](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/std/Mortal.sol)__
 

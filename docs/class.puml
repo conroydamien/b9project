@@ -13,7 +13,8 @@ package Contracts/Solidity {
 package "Project / IProject related entities" #DDDDDD {
 Project << (C,lightgreen) Contract>>
 ContribEvent << (E, red) Event>>
-DeactivateEvent << (E, red) Event>>
+FundedEvent << (E, red) Event>>
+RefundEvent << (E, red) Event>>
 IProject << (C, lightgreen) Contract>>
 }
 
@@ -27,7 +28,8 @@ ProjectSetManager *--> IProject
 
 Project -u-|> IProject
 IProject *--> ContribEvent
-IProject --> DeactivateEvent
+IProject --> RefundEvent
+IProject --> FundedEvent
 
 FundingHub *--> IProject
 FundingHub *--> Project
@@ -50,7 +52,8 @@ app *--> IProject
 app *--> Account
 app .u.> NewProjectEvent
 app ..> ContribEvent
-app ..> DeactivateEvent
+app ..> RefundEvent
+app ..> FundedEvent
 app --> web3
 index --> web3
 index -l-> AngularJS
