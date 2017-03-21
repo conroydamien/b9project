@@ -42,7 +42,7 @@ contract('FundingHub', function(accounts) {
        console.log(error);
      })
      .then(function(tx_id){
-       return fundingHub.allProjects.call();;
+       return fundingHub.allProjects.call();
      })
      .catch(function(error) {
        console.log(error);
@@ -79,11 +79,9 @@ contract('FundingHub', function(accounts) {
         console.log("contribution failed: " + error);
      })
      .then(function (tx) {
-//       console.log(tx);
         var recordGasCosts = function(tx) {
            return web3.eth.getTransactionPromise(tx.tx).then(function (txn) {
              var cost = tx.receipt.gasUsed * txn.gasPrice;
-//             console.log("cost: " + cost + " " + JSON.stringify(txn));
              gasCostForFunder[txn.from] = cost;
            });
         }
@@ -132,9 +130,9 @@ contract('FundingHub', function(accounts) {
 
        // refund!
 
-       return Project.at(projectToFund);
+       return Project.at(projectToFund).refund({from:payingAccount});
      })
-     .then(function(proj) {
+     .then(function(tx) {
         var withdrawFromTheProject = function(_funder) {
            return Project.at(projectToFund).withdraw(_funder, {from:_funder});
        }
