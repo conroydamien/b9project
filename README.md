@@ -58,9 +58,14 @@ The project consists of the following entities:
 
         A ContribEvent is emitted by a project when a contribution is made to the project. It prompts the user interface to update and reflect the contribution.
 
-  * __[DeactivateEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L17) (defined in IProject)__
+  * __[FundedEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L24) (defined in IProject)__
 
-        A DeactivateEvent is emitted by a project that is fully funded or refunded. It prompts the user interface to update and remove the project from the project list. It also prompts the user interface to alert the user to the deactivation with a reason: 'funded' or 'refunded'.
+        A FundedEvent is emitted by a project that is fully funded. It prompts the user interface to update and remove the project from the project list. It also prompts the user interface to alert the user to the deactivation with a reason: 'funded'.
+        
+  * __[RefundEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L29) (defined in IProject)__
+
+        A RefundEvent is emitted by a project that is to be refunded. It prompts the client (e.g. UI or unit test) to withdraw funds from the project to the contributors' accounts. It prompts the user interface to update and remove the project from the project list. It also prompts the user interface to alert the user to the deactivation with a reason: 'refunded'.
+        
 * __Views__
   * __[index.html](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/app/index.html)__
 
@@ -76,7 +81,7 @@ The project consists of the following entities:
 
 * __Testing__
 
-    A test of the refund functionality is provided in a file called [``refunds.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/test/refunds.js) in the ``test`` directory. It relies on [``promisifyWeb3.js``](https://gist.github.com/xavierlepretre/90f0feafccc07b267e44a87050b95caa#file-promisifyweb3-js) which is also checked in in the same directory. __For testing purposes the ``refund()`` method of the IProject and Project contracts is ``public``.__ This is because it was difficult to replicate the passing deadline in the tests and __is a vulnerability__ until it is changed. There is a [TODO:](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L88) comment in the code.
+    A test of the refund functionality is provided in a file called [``refunds.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/test/refunds.js) in the ``test`` directory. It relies on [``promisifyWeb3.js``](https://gist.github.com/xavierlepretre/90f0feafccc07b267e44a87050b95caa#file-promisifyweb3-js) which is also checked in in the same directory. 
 
 * __Migration__
 
