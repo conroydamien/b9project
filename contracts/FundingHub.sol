@@ -79,6 +79,6 @@ contract FundingHub is Mortal {
 
     // The external call should be the last call (Checks, Effects,
     // Interactions principle) 
-    _recipient.fund.value(contribution)(contributor);
+    if(!_recipient.fund.value(contribution)(contributor)) throw;
   }
 }
