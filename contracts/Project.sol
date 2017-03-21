@@ -37,6 +37,14 @@ contract Project is IProject {
       if (state != _state) throw;
       _;
   }
+  
+  /**
+   * allow only the owner to invoke the function
+   */
+   modifier ownerOnly() {
+     if(msg.sender !=  projectData.projectOwner) throw;
+     _;
+   }
 
   States public state = States.AcceptingFunds; 
   
@@ -107,7 +115,7 @@ contract Project is IProject {
    * Make all funds available to their contributor
    * and notify contributors that they can withdraw now
    */
-  function refund() internal {
+  function refund() ownerOnly {
     state = States.Refunding;
     RefundEvent();
   }
