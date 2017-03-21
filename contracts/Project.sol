@@ -25,12 +25,24 @@ contract Project is IProject {
       // no need to explicitly refund the 'after-deadline'
       // sender as payable function is not called.
       refund();
+      return;
     }
     _;
   }
 
+  /**
+   * check if we're ready to refund
+   */
+   modifier inRefundState() {
+     _;
+   }
+
   mapping(address => uint) public contributorBalance; // balances are tracked, rather than contributions
   address[] contributors; // keep a list of contributors as the keys of the hash cannot be listed
+
+  function getContributorList() public returns(address[]){
+    return contributors;
+  }
 
   /**
    * @param _owner the address to which funds from this project
@@ -59,6 +71,8 @@ contract Project is IProject {
     // full amount reached - return the excess to the original sender
       uint excess = this.balance - projectData.targetAmount;
       contributorBalance[_sender] -= excess;
+
+      // external call is last
       bool retVal = _sender.send(excess);
       if (!(retVal)) { throw; }
       payout();
@@ -74,30 +88,30 @@ contract Project is IProject {
    * Payout the funds to the owner and kill this project.
    */
   function payout() internal {
-    DeactivateEvent("payout");
+    FundedEvent();
     selfdestruct(projectData.projectOwner); // There are other options - this seems like the cleanest
   }
 
   /**
-   * Refund all funds to the correct contributor
-   * and kill this project.
-   *
-   * TODO: This function is public for testing purposes
-   * because triggering a refund via the deadline in the
-   * tests was very difficult, in production it should be internal
+   * Make all funds available to their contributor
+   * and notify contributors that they can withdraw now
    */
-  function refund() public {
-    if(this.balance > 0) {
-      address contributor;
-      bool retVal;
-      for(uint i = 0; i < contributors.length; ++i) {
-        contributor = contributors[i];
-        retVal = contributor.send(contributorBalance[contributor]);
-        if (!(retVal)) { throw; } // This is problematic - one contributor causing
-                                  // a failure could result in others not being paid
-      }
-    }
-    DeactivateEvent("refund");
-    selfdestruct(projectData.projectOwner);
+  function refund() internal {
+    RefundEvent();
+  }
+
+
+  function withdraw(address _funder) public inRefundState {
+    if(contributorBalance[_funder] == 0) return;
+
+    uint tmpBalance = contributorBalance[_funder];
+
+    // deduct from balance before trying to send
+    // Checks, Effects, Interactions principle
+    contributorBalance[_funder] = 0;
+
+    if(!_funder.send(tmpBalance)) throw;
+
+    if(this.balance == 0) selfdestruct;
   }
 }

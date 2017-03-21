@@ -15,7 +15,7 @@ app.controller('myCtrl', function($scope) {
 var FundingHub = contract(fundinghub_artifacts);
 var IProject = contract(iproject_artifacts);
 
-var gasRequiredByTestRPC = 1000000;
+var gas = 1000000;
 var defaultDeadline = 1513115725; //Tue, 12 Dec 2017 21:55:25 GMT
 $scope.projHash = {}; // model of a project to be used by UI
 
@@ -85,12 +85,36 @@ function updateAfterContribEvent(e,r) {
   });
 };
 
-// called after a DeactivateEvent is received
-// from a project
-function deleteProjectFromList(e,r) {
+function updateAfterRefundEvent(e,r) {
+
+  var project = r;
+
+  var withdrawFromTheProject = function(_funder) {
+    console.log(_funder);
+     return IProject.at(r.address).withdraw(_funder, {from:_funder});
+  }
+
+  // withdraw the funds of each contributor
+  return IProject.at(r.address).getContributorList.call()
+  .then(function(contributors) {
+    console.log(contributors);
+    return Promise.all(
+      contributors.map(withdrawFromTheProject)
+    )
+  })
+  .then(function(r) {
+    deleteProjectFromList(e,project,"refunded");
+  })
+}
+
+function updateAfterFundedEvent(e,r) {
+  deleteProjectFromList(e,r,"funded");
+}
+
+function deleteProjectFromList(e,r,reason) {
   alert("Project " + r.address +
         "\nhas been deactivated. \n\nIt will now be deleted from the list of projects" +
-        "\n\nReason: " + r.args.message);
+        "\n\nReason: " + reason);
   delete $scope.projHash[r.address];
   updateAccountList();
   $scope.$apply();
@@ -162,7 +186,10 @@ function subscribeToProjectEventsAndGetData(_prj) {
   return prj.projectData.call()
   .then(function(_data){
     data = _data
-    return prj.DeactivateEvent().watch(deleteProjectFromList);
+    return prj.FundedEvent().watch(updateAfterFundedEvent);
+  })
+  .then(function(r){
+    return prj.RefundEvent().watch(updateAfterRefundEvent);
   })
   .then(function(r){
     return prj.ContribEvent().watch(updateAfterContribEvent);
@@ -189,10 +216,10 @@ $scope.createProject = function() {
   FundingHub.deployed().then(function(instance) {
     return instance.createProject($scope.target,
                                   $scope.deadline,
-                                  {from:$scope.newProjectOwner.number, gas:gasRequiredByTestRPC});
+                                  {from:$scope.newProjectOwner.number, gas:gas});
   })
   .catch(function(error) {
-    alert("Error creating project.");
+    alert("Error creating project." + error);
   })
   .then(function(r) {
     updateAccountList();
@@ -208,10 +235,10 @@ $scope.fundProject = function(proj) {
     instance = _instance;
     return instance.contribute(proj, {from:$scope.account.number,
                                       value:$scope.amount,
-                                      gas:gasRequiredByTestRPC});
+                                      gas:gas});
   })
   .catch(function(error) {
-    alert("There has been an error making the contribution.");
+    alert("There has been an error making the contribution." + error);
   })
   .then(function(r) {
     updateAccountList();

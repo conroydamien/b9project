@@ -79,9 +79,11 @@ contract('FundingHub', function(accounts) {
         console.log("contribution failed: " + error);
      })
      .then(function (tx) {
+//       console.log(tx);
         var recordGasCosts = function(tx) {
-           web3.eth.getTransactionPromise(tx.tx).then(function (txn) {
+           return web3.eth.getTransactionPromise(tx.tx).then(function (txn) {
              var cost = tx.receipt.gasUsed * txn.gasPrice;
+//             console.log("cost: " + cost + " " + JSON.stringify(txn));
              gasCostForFunder[txn.from] = cost;
            });
         }
@@ -130,12 +132,31 @@ contract('FundingHub', function(accounts) {
 
        // refund!
 
-       return Project.at(projectToFund).refund();
+       return Project.at(projectToFund);
+     })
+     .then(function(proj) {
+        var withdrawFromTheProject = function(_funder) {
+           return Project.at(projectToFund).withdraw(_funder, {from:_funder});
+       }
+
+       return Promise.all(
+         funderAccounts.map(withdrawFromTheProject)
+       );
+     })
+     .then(function (tx) {
+        var recordGasWithdrawlCosts = function(tx) {
+           return web3.eth.getTransactionPromise(tx.tx).then(function (txn) {
+             var cost = tx.receipt.gasUsed * txn.gasPrice;
+             console.log(txn.from);
+             return gasCostForFunder[txn.from] += cost;
+           });
+        }
+
+         // add on the gas cost incurred by each withdrawl
+        return tx.map(recordGasWithdrawlCosts);
      })
      .then(function(r) {
        return web3.eth.getBalancePromise(projectToFund);
-     }).catch(function(error) {
-       console.log(error);
      })
      .then(function(projectBalance) {
        return assert.equal(projectBalance.toString(10), 0,
@@ -143,9 +164,10 @@ contract('FundingHub', function(accounts) {
      })
      .then(function(r) {
 
-       var checkBalanceAfterContribution = function(funder) {
+       var checkBalanceAfterRefund = function(funder) {
          return web3.eth.getBalancePromise(funder)
          .then(function(balanceAfterRefund) {
+           console.log("ff: " + funder + " " + gasCostForFunder[funder]);
            return assert.equal(balanceAfterRefund
                                .plus(gasCostForFunder[funder])
                                .minus(funderBalanceBeforeContribution[funder]).toString(10)
@@ -156,7 +178,7 @@ contract('FundingHub', function(accounts) {
        // ensure that after the refunds each funder
        // has incurred only the gas cost
        return Promise.all(
-         funderAccounts.map(checkBalanceAfterContribution)
+         funderAccounts.map(checkBalanceAfterRefund)
        );
      })
      .catch(function(error) {

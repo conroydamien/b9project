@@ -4,6 +4,13 @@ import "./std/Mortal.sol";
 
 contract IProject is Mortal {
 
+    enum Stages {
+      AcceptingFunds,
+      Refunding,
+      Funded,
+      Refunded
+    }
+
   /**
    * Notify any listeners that this project has been
    * contributed to
@@ -12,20 +19,26 @@ contract IProject is Mortal {
   );
 
   /**
-   * Notify any listeners that this project has been deactivated
+   * Notify any listeners that this project has been funded
    */
-  event DeactivateEvent(
-    string message
-  );
+  event FundedEvent();
 
   /**
-   * The following four functions and
+   * Notify any listeners that this project has been refunded
+   */
+  event RefundEvent();
+
+  function withdraw(address _funder) public {}
+  function getContributorList() public returns(address[]){}
+
+  /**
+   * The following three functions and
    * struct are project requirements
    */
 
   function fund(address _address) public payable {}
   function payout() internal {}
-  function refund() public {} // public for testing purposes
+  function refund() internal {}
 
   struct ProjectData {
     address projectOwner; // address of project owner
