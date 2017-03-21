@@ -4,19 +4,16 @@ import "./std/Mortal.sol";
 
 contract IProject is Mortal {
 
-    enum Stages {
+    enum States {
       AcceptingFunds,
-      Refunding,
-      Funded,
-      Refunded
+      Refunding
     }
 
   /**
    * Notify any listeners that this project has been
    * contributed to
    */
-  event ContribEvent(
-  );
+  event ContribEvent();
 
   /**
    * Notify any listeners that this project has been funded
@@ -36,8 +33,8 @@ contract IProject is Mortal {
    * struct are project requirements
    */
 
-  function fund(address _address) public payable {}
-  function payout() internal {}
+  function fund(address _address) public payable returns (bool) {}
+  function payout() internal returns (bool) {}
   function refund() internal {}
 
   struct ProjectData {

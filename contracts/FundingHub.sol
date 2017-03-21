@@ -72,8 +72,11 @@ contract FundingHub is Mortal {
     if(deadline < now || _recipient.balance + contribution >= target)
     {
       // we've passed the deadline or reached the target
+      // the funding hub will not be dealing with this project anymore
+      // after this contribution
       ProjectSetManager.tagAsInactive(projSet, _recipient);
     } 
+
     // The external call should be the last call (Checks, Effects,
     // Interactions principle) 
     _recipient.fund.value(contribution)(contributor);

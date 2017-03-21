@@ -31,15 +31,24 @@ contract Project is IProject {
   }
 
   /**
-   * check if we're ready to refund
+   * generic modifier to check state
    */
-   modifier inRefundState() {
-     _;
-   }
+  modifier inState(States _state) {
+      if (state != _state) throw;
+      _;
+  }
 
+  States public state = States.AcceptingFunds; 
+  
   mapping(address => uint) public contributorBalance; // balances are tracked, rather than contributions
   address[] contributors; // keep a list of contributors as the keys of the hash cannot be listed
 
+  /**
+   * returns a list of all contributors
+   * can be used by client to see which accounts should seek a refund
+   *
+   * @return a list of all of all contributors to this project
+   */
   function getContributorList() public returns(address[]){
     return contributors;
   }
@@ -60,7 +69,7 @@ contract Project is IProject {
    *
    *  @param _sender the address of the sender that called the funding hub
    */
-  function fund(address _sender) payable nonZeroModifier refundIfPastDeadline {
+  function fund(address _sender) payable nonZeroModifier refundIfPastDeadline inState(States.AcceptingFunds) returns(bool){
     // for new contributors
     if(contributorBalance[_sender] == 0){ // no existing balance for this contributor
       contributors.push(_sender); // add to the array of contributors
@@ -72,24 +81,26 @@ contract Project is IProject {
       uint excess = this.balance - projectData.targetAmount;
       contributorBalance[_sender] -= excess;
 
-      // external call is last
+      // external call is last thing before payout (selfdestruct)
       bool retVal = _sender.send(excess);
       if (!(retVal)) { throw; }
-      payout();
+      return payout();
     } else if (this.balance < projectData.targetAmount) {
       contributorBalance[_sender] += msg.value;
-      ContribEvent(); // only send event here. payout() sends DeactivateEvent
+      ContribEvent(); // only send event here. payout() sends FundedEvent
+      return true;
     } else { // target reached with no excess
-      payout();
+      return payout();
     }
   }
 
   /**
    * Payout the funds to the owner and kill this project.
    */
-  function payout() internal {
+  function payout() internal returns (bool){
     FundedEvent();
     selfdestruct(projectData.projectOwner); // There are other options - this seems like the cleanest
+    return true; // kinda pointless
   }
 
   /**
@@ -97,20 +108,26 @@ contract Project is IProject {
    * and notify contributors that they can withdraw now
    */
   function refund() internal {
+    state = States.Refunding;
     RefundEvent();
   }
 
+  /**
+   * This allows a contributor to retrieve their funds if the 
+   * project is in the refunding state
+   *
+   *  @param _contributor the address of the contributor to return the funds to 
+   */
+  function withdraw(address _contributor) public inState(States.Refunding) {
+    if(contributorBalance[_contributor] == 0) return;
 
-  function withdraw(address _funder) public inRefundState {
-    if(contributorBalance[_funder] == 0) return;
-
-    uint tmpBalance = contributorBalance[_funder];
+    uint tmpBalance = contributorBalance[_contributor];
 
     // deduct from balance before trying to send
     // Checks, Effects, Interactions principle
-    contributorBalance[_funder] = 0;
+    contributorBalance[_contributor] = 0;
 
-    if(!_funder.send(tmpBalance)) throw;
+    if(!_contributor.send(tmpBalance)) throw;
 
     if(this.balance == 0) selfdestruct;
   }
