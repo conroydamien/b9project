@@ -122,8 +122,7 @@ contract Project is IProject {
    *
    */
   function testRefund() ownerOnly() {
-    state = States.Refunding;
-    RefundEvent();
+    refund();
   }
 
   /**
