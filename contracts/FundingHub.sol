@@ -9,12 +9,12 @@ import "./std/Mortal.sol";
 // contribution to funding projects
 
 contract FundingHub is Mortal {
-  
+
   // delegated to for management of the set of projects
   ProjectSetManager.ProjectSet projSet;
 
   /**
-   * Throw if a project is inactive 
+   * Throw if a project is inactive
    */
   modifier onlyActiveProjects(IProject _project) {
     if(!isActive(_project)){
@@ -75,10 +75,10 @@ contract FundingHub is Mortal {
       // the funding hub will not be dealing with this project anymore
       // after this contribution
       ProjectSetManager.tagAsInactive(projSet, _recipient);
-    } 
+    }
 
     // The external call should be the last call (Checks, Effects,
-    // Interactions principle) 
+    // Interactions principle)
     if(!_recipient.fund.value(contribution)(contributor)) throw;
   }
 }

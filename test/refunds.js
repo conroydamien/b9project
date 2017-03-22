@@ -137,6 +137,7 @@ contract('FundingHub', function(accounts) {
            return Project.at(projectToFund).withdraw(_funder, {from:_funder});
        }
 
+       // withdraw for each contributor
        return Promise.all(
          funderAccounts.map(withdrawFromTheProject)
        );
@@ -145,7 +146,6 @@ contract('FundingHub', function(accounts) {
         var recordGasWithdrawlCosts = function(tx) {
            return web3.eth.getTransactionPromise(tx.tx).then(function (txn) {
              var cost = tx.receipt.gasUsed * txn.gasPrice;
-             console.log(txn.from);
              return gasCostForFunder[txn.from] += cost;
            });
         }
@@ -165,7 +165,6 @@ contract('FundingHub', function(accounts) {
        var checkBalanceAfterRefund = function(funder) {
          return web3.eth.getBalancePromise(funder)
          .then(function(balanceAfterRefund) {
-           console.log("ff: " + funder + " " + gasCostForFunder[funder]);
            return assert.equal(balanceAfterRefund
                                .plus(gasCostForFunder[funder])
                                .minus(funderBalanceBeforeContribution[funder]).toString(10)

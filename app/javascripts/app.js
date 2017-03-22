@@ -85,6 +85,8 @@ function updateAfterContribEvent(e,r) {
   });
 };
 
+// called after a RefundEvent is received
+// from a project
 function updateAfterRefundEvent(e,r) {
 
   var project = r;
@@ -107,6 +109,8 @@ function updateAfterRefundEvent(e,r) {
   })
 }
 
+// called after a FundedEvent is received
+// from a project
 function updateAfterFundedEvent(e,r) {
   deleteProjectFromList(e,r,"funded");
 }

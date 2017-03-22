@@ -7,17 +7,6 @@ import "./IProject.sol";
 contract Project is IProject {
 
   /**
-   * don't bother if the amount is 0
-   * it would just create a bogus contributor
-   */
-  modifier nonZeroModifier() {
-    if (msg.value == 0) {
-      return;
-    }
-    _;
-  }
-
-  /**
    * don't accept funds past the deadline
    */
   modifier refundIfPastDeadline() {
@@ -37,7 +26,7 @@ contract Project is IProject {
       if (state != _state) throw;
       _;
   }
-  
+
   /**
    * allow only the owner to invoke the function
    */
@@ -46,8 +35,8 @@ contract Project is IProject {
      _;
    }
 
-  States public state = States.AcceptingFunds; 
-  
+  States public state = States.AcceptingFunds;
+
   mapping(address => uint) public contributorBalance; // balances are tracked, rather than contributions
   address[] contributors; // keep a list of contributors as the keys of the hash cannot be listed
 
@@ -75,40 +64,42 @@ contract Project is IProject {
   /**
    * Contribute to this project and attribute the contribution to the sender
    *
-   *  @param _sender the address of the sender that called the funding hub
+   * @param _contributor the address of the contributor that called the funding hub
    */
-  function fund(address _sender) payable nonZeroModifier refundIfPastDeadline inState(States.AcceptingFunds) returns(bool){
-    // for new contributors
-    if(contributorBalance[_sender] == 0){ // no existing balance for this contributor
-      contributors.push(_sender); // add to the array of contributors
-      contributorBalance[_sender] = 0; // initialise balance to zero
+  function fund(address _contributor) payable
+              refundIfPastDeadline inState(States.AcceptingFunds) returns(bool) {
+
+    //for new contributors
+    if(contributorBalance[_contributor] == 0){ // no existing balance for this contributor
+      contributors.push(_contributor); // add to the array of contributors
     }
 
     if(this.balance > projectData.targetAmount) {
     // full amount reached - return the excess to the original sender
       uint excess = this.balance - projectData.targetAmount;
-      contributorBalance[_sender] -= excess;
+      contributorBalance[_contributor] -= excess;
 
       // external call is last thing before payout (selfdestruct)
-      bool retVal = _sender.send(excess);
-      if (!(retVal)) { throw; }
-      return payout();
-    } else if (this.balance < projectData.targetAmount) {
-      contributorBalance[_sender] += msg.value;
-      ContribEvent(); // only send event here. payout() sends FundedEvent
-      return true;
-    } else { // target reached with no excess
-      return payout();
+      if(!_contributor.send(excess)) throw;
+      payout();
     }
+
+    if(this.balance == projectData.targetAmount) {
+      payout();
+    }
+
+    contributorBalance[_contributor] += msg.value;
+    ContribEvent();
+
+    return true;
   }
 
   /**
    * Payout the funds to the owner and kill this project.
    */
-  function payout() internal returns (bool){
+  function payout() internal {
     FundedEvent();
     selfdestruct(projectData.projectOwner); // There are other options - this seems like the cleanest
-    return true; // kinda pointless
   }
 
   /**
@@ -121,10 +112,10 @@ contract Project is IProject {
   }
 
   /**
-   * This allows a contributor to retrieve their funds if the 
+   * This allows a contributor to retrieve their funds if the
    * project is in the refunding state
    *
-   *  @param _contributor the address of the contributor to return the funds to 
+   *  @param _contributor the address of the contributor to return the funds to
    */
   function withdraw(address _contributor) public inState(States.Refunding) {
     if(contributorBalance[_contributor] == 0) return;

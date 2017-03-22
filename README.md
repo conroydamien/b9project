@@ -47,7 +47,7 @@ The project consists of the following entities:
   * __[IProject](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol)__
 
         IProject is an abstract contract that declares the functions and struct required of a project for the final exam. It also defines two types of event - ContribEvent and DeactivateEvent.
-  * __[Project](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol) (and modifiers [nonZeroModifier](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L13), [refundIfPastDeadline](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L23) and [inState](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L36))__
+  * __[Project](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol) (and modifiers [ownerOnly] (https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L33), [refundIfPastDeadline](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L12) and [inState](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L25))__
 
         Project is an implementation of the IProject contract.
 * __Events__ (Because events are used a number of UI clients may be kept updated on the same fundinghub)
@@ -61,11 +61,11 @@ The project consists of the following entities:
   * __[FundedEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L24) (defined in IProject)__
 
         A FundedEvent is emitted by a project that is fully funded. It prompts the user interface to update and remove the project from the project list. It also prompts the user interface to alert the user to the deactivation with a reason: 'funded'.
-        
+
   * __[RefundEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L29) (defined in IProject)__
 
         A RefundEvent is emitted by a project that is to be refunded. It prompts the client (e.g. UI or unit test) to withdraw funds from the project to the contributors' accounts. It prompts the user interface to update and remove the project from the project list. It also prompts the user interface to alert the user to the deactivation with a reason: 'refunded'.
-        
+
 * __Views__
   * __[index.html](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/app/index.html)__
 
@@ -81,7 +81,7 @@ The project consists of the following entities:
 
 * __Testing__
 
-    A test of the refund functionality is provided in a file called [``refunds.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/test/refunds.js) in the ``test`` directory. It relies on [``promisifyWeb3.js``](https://gist.github.com/xavierlepretre/90f0feafccc07b267e44a87050b95caa#file-promisifyweb3-js) which is also checked in in the same directory. 
+    A test of the refund functionality is provided in a file called [``refunds.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/test/refunds.js) in the ``test`` directory. It relies on [``promisifyWeb3.js``](https://gist.github.com/xavierlepretre/90f0feafccc07b267e44a87050b95caa#file-promisifyweb3-js) which is also checked in in the same directory.
 
 * __Migration__
 
@@ -94,7 +94,7 @@ The project consists of the following entities:
 
 * __send/withdraw decision__
 
-    ``IProject`` implementations (i.e. ``Project``) provide a ``withdraw`` function. When a project is to be refunded a ``RefundEvent`` is emitted and the client is responsible for retrieving the contributions from the project by invoking the ``withdraw`` method. This avoids invoking ``send`` operations in a (contract-side) loop. 
+    ``IProject`` implementations (i.e. ``Project``) provide a ``withdraw`` function. When a project is to be refunded a ``RefundEvent`` is emitted and the client is responsible for retrieving the contributions from the project by invoking the ``withdraw`` method. This avoids invoking ``send`` operations in a (contract-side) loop.
 
 * __[Mortal](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/std/Mortal.sol)__
 

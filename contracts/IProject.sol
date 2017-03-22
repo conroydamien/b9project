@@ -33,9 +33,9 @@ contract IProject is Mortal {
    * struct are project requirements
    */
 
-  function fund(address _address) public payable returns (bool) {}
-  function payout() internal returns (bool) {}
-  function refund() internal {}
+  function fund(address _contributor) payable returns (bool) {}
+  function payout() internal {}
+  function refund() {}
 
   struct ProjectData {
     address projectOwner; // address of project owner
