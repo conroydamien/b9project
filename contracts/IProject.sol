@@ -27,6 +27,7 @@ contract IProject is Mortal {
 
   function withdraw(address _funder) public {}
   function getContributorList() public returns(address[]){}
+  function testRefund() {}
 
   /**
    * The following three functions and
@@ -35,7 +36,7 @@ contract IProject is Mortal {
 
   function fund(address _contributor) payable returns (bool) {}
   function payout() internal {}
-  function refund() {}
+  function refund() internal {}
 
   struct ProjectData {
     address projectOwner; // address of project owner
