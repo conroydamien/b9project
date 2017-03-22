@@ -67,7 +67,7 @@ contract FundingHub is Mortal {
   function contribute(IProject _recipient) payable onlyActiveProjects(_recipient){
     var (owner, target, deadline) = _recipient.projectData();
 
-    if(deadline < now || _recipient.balance + contribution >= target)
+    if(deadline < now || _recipient.balance + msg.value >= target)
     {
       // we've passed the deadline or reached the target
       // the funding hub will not be dealing with this project anymore
