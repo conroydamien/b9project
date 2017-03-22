@@ -130,7 +130,7 @@ contract('FundingHub', function(accounts) {
 
        // refund!
 
-       return Project.at(projectToFund).refund({from:payingAccount});
+       return Project.at(projectToFund).testRefund({from:payingAccount});
      })
      .then(function(tx) {
         var withdrawFromTheProject = function(_funder) {
