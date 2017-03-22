@@ -65,8 +65,6 @@ contract FundingHub is Mortal {
    * @param _recipient The project to which the amount will be contributed.
    */
   function contribute(IProject _recipient) payable onlyActiveProjects(_recipient){
-    address contributor = msg.sender;
-    uint contribution = msg.value;
     var (owner, target, deadline) = _recipient.projectData();
 
     if(deadline < now || _recipient.balance + contribution >= target)
@@ -79,6 +77,6 @@ contract FundingHub is Mortal {
 
     // The external call should be the last call (Checks, Effects,
     // Interactions principle)
-    if(!_recipient.fund.value(contribution)(contributor)) throw;
+    if(!_recipient.fund.value(msg.value)(msg.sender)) throw;
   }
 }
