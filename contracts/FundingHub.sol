@@ -14,13 +14,10 @@ contract FundingHub is Mortal {
   ProjectSetManager.ProjectSet projSet;
 
   /**
-   * Throw if a project is inactive
+   * Only invoke if a project is active
    */
   modifier onlyActiveProjects(IProject _project) {
-    if(!isActive(_project)){
-      throw;
-    }
-    _;
+    if(isActive(_project)) _;
   }
 
   /**

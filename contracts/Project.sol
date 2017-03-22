@@ -10,29 +10,27 @@ contract Project is IProject {
    * don't accept funds past the deadline
    */
   modifier refundIfPastDeadline() {
-    if (now > projectData.deadline) {
-      // no need to explicitly refund the 'after-deadline'
-      // sender as payable function is not called.
+    // no need to explicitly refund the 'after-deadline'
+    // sender as payable function is not called.
+    if (now < projectData.deadline) {
+      _;
+    } else {
       refund();
-      return;
     }
-    _;
   }
 
   /**
    * generic modifier to check state
    */
   modifier inState(States _state) {
-      if (state != _state) throw;
-      _;
+      if (state == _state) _;
   }
 
   /**
    * allow only the owner to invoke the function
    */
    modifier ownerOnly() {
-     if(msg.sender !=  projectData.projectOwner) throw;
-     _;
+     if(msg.sender ==  projectData.projectOwner) _;
    }
 
   States public state = States.AcceptingFunds;
