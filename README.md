@@ -46,7 +46,7 @@ The project consists of the following entities:
         The FundingHub contract is used to create, manage and accept contributions for projects. It delegates management of the project list to the ProjectSetManager library and emits a NewProjectEvent each time a project is created. It declares the functions required for the final exam.
   * __[IProject](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol)__
 
-        IProject is an abstract contract that declares the functions and struct required of a project for the final exam. It also defines two types of event - ContribEvent and DeactivateEvent.
+        IProject is an abstract contract that declares the functions and struct required of a project for the final exam. It also defines three types of event - ContribEvent, FundedEvent and RefundEvent.
   * __[Project](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol) (and modifiers [ownerOnly] (https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L33), [refundIfPastDeadline](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L12) and [inState](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L25))__
 
         Project is an implementation of the IProject contract.
