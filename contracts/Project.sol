@@ -106,7 +106,22 @@ contract Project is IProject {
    * Make all funds available to their contributor
    * and notify contributors that they can withdraw now
    */
-  function refund() ownerOnly {
+  function refund() internal {
+    state = States.Refunding;
+    RefundEvent();
+  }
+  
+    /**
+   * Make all funds available to their contributor
+   * and notify contributors that they can withdraw now
+   *
+   * This is here because a passing deadline is difficult to 
+   * simulate in testing
+   *
+   * TODO: This method should be disabled when testing is complete
+   *
+   */
+  function testRefund() ownerOnly() {
     state = States.Refunding;
     RefundEvent();
   }
