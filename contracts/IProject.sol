@@ -25,7 +25,7 @@ contract IProject is Mortal {
    */
   event RefundEvent();
 
-  function withdraw(address _funder) public {}
+  function withdraw(address _contributor) public {}
   function getContributorList() public returns(address[]){}
   function testRefund() {}
 
