@@ -37,6 +37,8 @@ To fund a project:
 
 The interface will update to reflect changes to accounts and projects after project creation or funding.
 
+If funding a project results in a payout or a refund a dialog will inform the user and the project will be removed from the list of available projects.
+
 ## Contracts, Events, Views and Controllers
 The project consists of the following entities:
 
