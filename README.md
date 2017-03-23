@@ -24,7 +24,7 @@ When the application starts there is only one project available for funding. It 
 To create new projects the form at the top-right of the screen can be used.
 
 To create a new project:
-1. Choose a deadline by which the project must be funded. This is provided as a number of seconds from epoch.
+1. Choose a deadline by which the project must be funded. This is provided as a number of seconds from epoch. Use `date +%s` at a Linux command line to get the current date.
 2. Set a target in Wei to be raised by the project.
 3. Identify the owner of the project. This account will cover the gas for creating the project and will receive the project's funds if the project is fully funded before the deadline.
 4. Click on the 'Create a Project' button and the project will appear in the list of projects available for funding.
