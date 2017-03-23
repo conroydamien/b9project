@@ -43,7 +43,8 @@ contract FundingHub is Mortal {
   }
 
   /**
-   * Returns a new IProject implementation
+   * Returns a new IProject implementation (Maybe a factory could be
+   * injected during the migration? Not necessary for this example.)
    *
    * @param _target The amount to be raised.
    * @param _deadline If the target is not hit by deadline then refund
