@@ -81,7 +81,7 @@ The project consists of the following entities:
 
 * __Testing__
 
-    A test of the refund functionality is provided in a file called [``refunds.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/test/refunds.js) in the ``test`` directory. It relies on [``promisifyWeb3.js``](https://gist.github.com/xavierlepretre/90f0feafccc07b267e44a87050b95caa#file-promisifyweb3-js) which is also checked in in the same directory. __For testing purposes the ``testRefund()`` method is provided in the IProject and Project contracts and, while it can only be invoked by the project owner, it is ``public``.__ This is because it was difficult to replicate the passing deadline in the tests. The method __is a vulnerability__ until it is changed. There is a [TODO:](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L121) comment in the code.
+    A test of the refund functionality is provided in a file called [``refunds.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/test/refunds.js) in the ``test`` directory. It relies on [``promisifyWeb3.js``](https://gist.github.com/xavierlepretre/90f0feafccc07b267e44a87050b95caa#file-promisifyweb3-js) which is also checked in in the same directory. __For testing purposes the ``testRefund()`` method is provided in the IProject and Project contracts and, while it can only be invoked by the project owner, it is ``public``.__ This is because it was difficult to replicate the passing deadline in the tests. The method __is a vulnerability__ until it is changed. There is a [TODO:](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L115) comment in the code.
 
 * __Migration__
 
