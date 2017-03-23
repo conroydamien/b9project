@@ -51,6 +51,7 @@ contract FundingHub is Mortal {
    * @return the address of the contract for the project created.
    */
   function createProject(uint _target, uint _deadline) public returns (IProject){
+    // we'll allow deadlines in the past (see README)
     IProject project = new Project(msg.sender, _target, _deadline);
     ProjectSetManager.add(projSet, project);
     NewProjectEvent(project);
