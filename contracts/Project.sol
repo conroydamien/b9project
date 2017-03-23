@@ -112,7 +112,7 @@ contract Project is IProject {
    * This is here because a passing deadline is difficult to
    * simulate in testing
    *
-   * TODO: This method should be disabled when testing is complete
+   * TODO: This method should be disabled somehow when not testing.
    *
    */
   function testRefund() ownerOnly() {
