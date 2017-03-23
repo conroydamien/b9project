@@ -85,7 +85,7 @@ The project consists of the following entities:
 
 * __Migration__
 
-    The Truffle migration task calls the ``createProject`` method of the funding hub to create the first project. See the [``2_deploy_contracts.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/migrations/2_deploy_contracts.js) file in the ``migrations`` directory.
+    The Truffle migration task calls the ``createProject`` method of the funding hub to create the first project. See the [``2_deploy_contracts.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/migrations/2_deploy_contracts.js#L20) file in the ``migrations`` directory.
 
 ## Other notes
 * __Projects with deadlines in the past__
