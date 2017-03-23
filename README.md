@@ -101,3 +101,7 @@ The project consists of the following entities:
 * __[Mortal](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/std/Mortal.sol)__
 
     All contracts are mortal.
+    
+* __A thought__
+
+    The migration scripts got me thinking about dependency injection. It would be overkill here to inject an `IProject` factory into the `FundingHub`, I like the idea though.
