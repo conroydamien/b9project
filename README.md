@@ -56,7 +56,7 @@ The project consists of the following entities:
   * __[NewProjectEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/FundingHub.sol#L26) (defined in FundingHub)__
 
         A NewProjectEvent is emitted by the funding hub when a new project is created.
-  * __[ContribEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L11) (defined in IProject)__
+  * __[ContribEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L16) (defined in IProject)__
 
         A ContribEvent is emitted by a project when a contribution is made to the project. It prompts the user interface to update and reflect the contribution.
 
