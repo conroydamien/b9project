@@ -88,18 +88,15 @@ function updateAfterContribEvent(e,r) {
 // called after a RefundEvent is received
 // from a project
 function updateAfterRefundEvent(e,r) {
-
   var project = r;
 
   var withdrawFromTheProject = function(_funder) {
-    console.log(_funder);
      return IProject.at(r.address).withdraw(_funder, {from:_funder});
   }
 
   // withdraw the funds of each contributor
   return IProject.at(r.address).getContributorList.call()
   .then(function(contributors) {
-    console.log(contributors);
     return Promise.all(
       contributors.map(withdrawFromTheProject)
     )

@@ -7,19 +7,6 @@ import "./IProject.sol";
 contract Project is IProject {
 
   /**
-   * don't accept funds past the deadline
-   */
-  modifier refundIfPastDeadline() {
-    // no need to explicitly refund the 'after-deadline'
-    // sender as payable function is not called.
-    if (now < projectData.deadline) {
-      _;
-    } else {
-      refund();
-    }
-  }
-
-  /**
    * generic modifier to check state
    */
   modifier inState(States _state) {
@@ -44,7 +31,7 @@ contract Project is IProject {
    *
    * @return a list of all of all contributors to this project
    */
-  function getContributorList() public returns(address[]){
+  function getContributorList() returns(address[]){
     return contributors;
   }
 
@@ -64,8 +51,19 @@ contract Project is IProject {
    *
    * @param _contributor the address of the contributor that called the funding hub
    */
-  function fund(address _contributor) payable
-              refundIfPastDeadline inState(States.AcceptingFunds) returns(bool) {
+  function fund(address _contributor) payable inState(States.AcceptingFunds) returns(bool) {
+
+    // If it is past the deadline
+    // then return this contribution and
+    // make all contributions
+    // available for refund immediately.
+    // Unfortunately the 'after-deadline'
+    // contributor is hit for the gas.
+    if (now > projectData.deadline) {
+      refund(); // changes state to 'Refunding', preventing reentry
+      if(!_contributor.send(msg.value)) throw;
+      return true;
+    }
 
     //for new contributors
     if(contributorBalance[_contributor] == 0){ // no existing balance for this contributor
@@ -80,14 +78,12 @@ contract Project is IProject {
       // external call is last thing before payout (selfdestruct)
       if(!_contributor.send(excess)) throw;
       payout();
-    }
-
-    if(this.balance == projectData.targetAmount) {
+    } else if(this.balance == projectData.targetAmount) {
       payout();
+    } else {
+      contributorBalance[_contributor] += msg.value;
+      ContribEvent();
     }
-
-    contributorBalance[_contributor] += msg.value;
-    ContribEvent();
 
     return true;
   }
@@ -108,12 +104,12 @@ contract Project is IProject {
     state = States.Refunding;
     RefundEvent();
   }
-  
+
     /**
    * Make all funds available to their contributor
    * and notify contributors that they can withdraw now
    *
-   * This is here because a passing deadline is difficult to 
+   * This is here because a passing deadline is difficult to
    * simulate in testing
    *
    * TODO: This method should be disabled when testing is complete
