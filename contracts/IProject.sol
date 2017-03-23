@@ -27,7 +27,7 @@ contract IProject is Mortal {
 
   function withdraw(address _contributor) public {}
   function getContributorList() public returns(address[]){}
-  function testRefund() {}
+  function testRefund() {} // see README file - this is for testing purposes
 
   /**
    * The following three functions and
