@@ -60,11 +60,11 @@ The project consists of the following entities:
 
         A ContribEvent is emitted by a project when a contribution is made to the project. It prompts the user interface to update and reflect the contribution.
 
-  * __[FundedEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L24) (defined in IProject)__
+  * __[FundedEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L21) (defined in IProject)__
 
         A FundedEvent is emitted by a project that is fully funded. It prompts the user interface to update and remove the project from the project list. It also prompts the user interface to alert the user to the deactivation with a reason: 'funded'.
 
-  * __[RefundEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L29) (defined in IProject)__
+  * __[RefundEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L26) (defined in IProject)__
 
         A RefundEvent is emitted by a project that is to be refunded. It prompts the client (e.g. UI or unit test) to withdraw funds from the project to the contributors' accounts. It prompts the user interface to update and remove the project from the project list. It also prompts the user interface to alert the user to the deactivation with a reason: 'refunded'.
 
