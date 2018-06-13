@@ -1,6 +1,9 @@
 # Damien Conroy - final project
 
-The project repository is at: https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy
+The project repository was originally at: https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy. Copied to GitHub in June 2018.
+
+## The Project
+The specification of the project is the property of [B9Academy](https://academy.b9lab.com/), this is a brief description. The project entailed creating a 'funding hub' contract that could be used to manage a set of contracts, each of which controls the funding of a project. In short, the creator of the project sets a target amount and a deadline. If the target amount is reached before the deadline the funds are released to the project creator, otherwise the funds are returned to the contributors. The only automated test to be submitted with the project was a test of the refund functionality.
 
 ## Getting started
 This is a project created with Truffle v3.1.2 and Webpack using AngularJS with TestRPC as the target client.
@@ -43,37 +46,37 @@ If funding a project results in a payout or a refund a dialog will inform the us
 The project consists of the following entities:
 
 * __Contracts__
-  * __[FundingHub](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/FundingHub.sol) (and the [ProjectSetManager](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/ProjectSetManager.sol) library and the [onlyActiveProjects](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/FundingHub.sol#L19) modifier)__
+  * __[FundingHub](contracts/FundingHub.sol) (and the [ProjectSetManager](contracts/ProjectSetManager.sol) library and the [onlyActiveProjects](contracts/FundingHub.sol#L19) modifier)__
 
         The FundingHub contract is used to create, manage and accept contributions for projects. It delegates management of the project list to the ProjectSetManager library and emits a NewProjectEvent each time a project is created. It declares the functions required for the final exam.
-  * __[IProject](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol)__
+  * __[IProject](contracts/IProject.sol)__
 
         IProject is an abstract contract that declares the functions and struct required of a project for the final exam. It also defines three types of event - ContribEvent, FundedEvent and RefundEvent.
-  * __[Project](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol) (and modifiers [ownerOnly] (https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L19) and [inState](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L12))__
+  * __[Project](contracts/Project.sol) (and modifiers [ownerOnly] (contracts/Project.sol#L19) and [inState](contracts/Project.sol#L12))__
 
         Project is an implementation of the IProject contract.
 * __Events__ (Because events are used a number of UI clients may be kept updated on the same funding hub)
-  * __[NewProjectEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/FundingHub.sol#L26) (defined in FundingHub)__
+  * __[NewProjectEvent](contracts/FundingHub.sol#L26) (defined in FundingHub)__
 
         A NewProjectEvent is emitted by the funding hub when a new project is created.
-  * __[ContribEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L16) (defined in IProject)__
+  * __[ContribEvent](contracts/IProject.sol#L16) (defined in IProject)__
 
         A ContribEvent is emitted by a project when a contribution is made to the project. It prompts the user interface to update and reflect the contribution.
 
-  * __[FundedEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L21) (defined in IProject)__
+  * __[FundedEvent](contracts/IProject.sol#L21) (defined in IProject)__
 
         A FundedEvent is emitted by a project that is fully funded. It prompts the user interface to update and remove the project from the project list. It also prompts the user interface to alert the user to the deactivation with a reason: 'funded'.
 
-  * __[RefundEvent](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/IProject.sol#L26) (defined in IProject)__
+  * __[RefundEvent](contracts/IProject.sol#L26) (defined in IProject)__
 
         A RefundEvent is emitted by a project that is to be refunded. It prompts the client (e.g. UI or unit test) to withdraw funds from the project to the contributors' accounts. It prompts the user interface to update and remove the project from the project list. It also prompts the user interface to alert the user to the deactivation with a reason: 'refunded'.
 
 * __Views__
-  * __[index.html](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/app/index.html)__
+  * __[index.html](app/index.html)__
 
         The application has one view, ``index.html`` which is an AngularJS view.
 * __Controllers__
-  * __[app.js](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/app/javascripts/app.js)__
+  * __[app.js](app/javascripts/app.js)__
 
         The application has one controller. The controller is based on the Truffle ``app.js`` file which is adapted to be an AngularJS controller. The ``app.js`` file also contains all the client-side logic for rendering the user interface and employs the web3 library to interact with TestRPC. The controller subscribes to all events emitted by the contracts.
 
@@ -83,11 +86,11 @@ The project consists of the following entities:
 
 * __Testing__
 
-    A test of the refund functionality is provided in a file called [``refunds.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/test/refunds.js) in the ``test`` directory. Use `truffle test` at the command line to run it. It relies on [``promisifyWeb3.js``](https://gist.github.com/xavierlepretre/90f0feafccc07b267e44a87050b95caa#file-promisifyweb3-js) which is also checked in in the same directory. __For testing purposes the ``testRefund()`` method is provided in the IProject and Project contracts and, while it can only be invoked by the project owner, it is ``public``.__ This is because I found it difficult to replicate a passing deadline in the tests. The method __is a vulnerability__ until it is changed. There is a [TODO:](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/Project.sol#L115) comment in the code.
+    A test of the refund functionality is provided in a file called [``refunds.js``](test/refunds.js) in the ``test`` directory. Use `truffle test` at the command line to run it. It relies on [``promisifyWeb3.js``](https://gist.github.com/xavierlepretre/90f0feafccc07b267e44a87050b95caa#file-promisifyweb3-js) which is also checked in in the same directory. __For testing purposes the ``testRefund()`` method is provided in the IProject and Project contracts and, while it can only be invoked by the project owner, it is ``public``.__ This is because I found it difficult to replicate a passing deadline in the tests. The method __is a vulnerability__ until it is changed. There is a [TODO:](contracts/Project.sol#L115) comment in the code.
 
 * __Migration__
 
-    The Truffle migration task calls the ``createProject`` method of the funding hub to create the first project. See the [``2_deploy_contracts.js``](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/migrations/2_deploy_contracts.js#L20) file in the ``migrations`` directory.
+    The Truffle migration task calls the ``createProject`` method of the funding hub to create the first project. See the [``2_deploy_contracts.js``](migrations/2_deploy_contracts.js#L20) file in the ``migrations`` directory.
 
 ## Other notes
 * __Projects with deadlines in the past__
@@ -98,10 +101,10 @@ The project consists of the following entities:
 
     ``IProject`` implementations (i.e. ``Project``) provide a ``withdraw`` function. When a project is to be refunded a ``RefundEvent`` is emitted and the client is responsible for retrieving the contributions from the project by invoking the ``withdraw`` method. This avoids invoking ``send`` operations in a (contract-side) loop.
 
-* __[Mortal](https://git.academy.b9lab.com/ETH-6-exam-projects/damienconroy/blob/master/contracts/std/Mortal.sol)__
+* __[Mortal](contracts/std/Mortal.sol)__
 
     All contracts are mortal.
-    
+
 * __A thought__
 
     The migration scripts got me thinking about dependency injection. It would be overkill here to inject an `IProject` factory into the `FundingHub`, I like the idea though.
